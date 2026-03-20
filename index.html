@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -638,76 +637,122 @@ function pickColor(el, gridId, idx) {
 // ═══════════════════════════════════
 function initPeer() {
   setStatus('connecting…');
+  if (peer && !peer.destroyed) { try { peer.destroy(); } catch(e){} }
+  peer = null;
+
+  // Use stored peerId so our share-link stays valid.
+  // If PeerJS rejects it (id_taken), we get a new one and update storage.
+  const tryId = me.peerId;
   try {
-    peer = new Peer(me.peerId, {
-      debug: 1,
+    peer = new Peer(tryId, {
+      debug: 2,
       config: {
         iceServers: [
-          // Google STUN — free, no signup, discovers public IP
           { urls: 'stun:stun.l.google.com:19302' },
           { urls: 'stun:stun1.l.google.com:19302' },
           { urls: 'stun:stun2.l.google.com:19302' },
           { urls: 'stun:stun3.l.google.com:19302' },
-          // freestun.net — public TURN, no signup required
           { urls: 'turn:freestun.net:3478',  username: 'free', credential: 'free' },
           { urls: 'turns:freestun.net:5349', username: 'free', credential: 'free' },
         ]
       }
     });
   } catch(e) {
+    console.error('Peer constructor error:', e);
     setStatus('peer error');
     return;
   }
 
-  peer.on('open', () => {
+  peer.on('open', id => {
+    console.log('PeerJS open, got id:', id);
+    // If PeerJS gave us a different id (id_taken fallback), update storage
+    if (id !== me.peerId) {
+      console.warn('PeerID changed from', me.peerId, 'to', id, '— updating');
+      me.peerId = id;
+      localStorage.setItem('wave_me', JSON.stringify(me));
+      renderSidebarMe();
+    }
     setStatus('online');
-    contacts.forEach(c => dial(c));
+    // Small delay so both peers have time to register
+    setTimeout(() => contacts.forEach(c => dial(c)), 500);
     setInterval(() => {
       Object.values(conns).forEach(c => { if (c.open) c.send({ t:'ping' }); });
-    }, 6000);
+      // Retry any contacts not connected
+      contacts.forEach(c => {
+        if (!conns[c.peerId] || !conns[c.peerId].open) dial(c);
+      });
+    }, 8000);
   });
 
-  peer.on('connection', conn => setupConn(conn));
+  peer.on('connection', conn => {
+    console.log('Incoming connection from:', conn.peer);
+    setupConn(conn);
+  });
   peer.on('call', call => onIncomingCall(call));
-  peer.on('disconnected', () => { setStatus('reconnecting…'); try { peer.reconnect(); } catch(e){} });
+  peer.on('disconnected', () => {
+    console.warn('PeerJS disconnected, reconnecting…');
+    setStatus('reconnecting…');
+    setTimeout(() => { try { peer.reconnect(); } catch(e) { initPeer(); } }, 2000);
+  });
   peer.on('error', e => {
-    console.warn('PeerJS error:', e.type, e.message);
+    console.error('PeerJS error:', e.type, e);
     if (e.type === 'peer-unavailable') {
-      // Contact is offline right now, retry dial in 15s
       const pid = e.message?.match(/Could not connect to peer (.+)/)?.[1];
+      console.log('Peer unavailable:', pid, '— will retry in 12s');
       if (pid) {
         const c = contacts.find(c => c.peerId === pid);
-        if (c) setTimeout(() => dial(c), 15000);
+        if (c) setTimeout(() => dial(c), 12000);
       }
       return;
     }
-    if (e.type === 'network' || e.type === 'server-error' || e.type === 'socket-error') {
-      setStatus('reconnecting…');
-      setTimeout(initPeer, 4000);
+    if (e.type === 'unavailable-id') {
+      // Our stored ID is taken by a stale session, get a fresh one
+      console.warn('ID taken, getting fresh one…');
+      me.peerId = crypto.randomUUID();
+      localStorage.setItem('wave_me', JSON.stringify(me));
+      setTimeout(initPeer, 1000);
+      return;
     }
+    setStatus('error — retrying…');
+    setTimeout(initPeer, 4000);
   });
 }
 
 function dial(contact) {
-  if (conns[contact.peerId]?.open) return;
-  const conn = peer.connect(contact.peerId, { reliable: true, serialization: 'json' });
+  if (!peer || peer.destroyed || peer.disconnected) return;
+  const existing = conns[contact.peerId];
+  if (existing) {
+    if (existing.open) return; // already connected
+    try { existing.close(); } catch(e) {}
+    delete conns[contact.peerId];
+  }
+  console.log('Dialing', contact.name, contact.peerId);
+  const conn = peer.connect(contact.peerId, { reliable: true });
   setupConn(conn);
 }
 
 function setupConn(conn) {
   conns[conn.peer] = conn;
   conn.on('open', () => {
+    console.log('Connection OPEN with', conn.peer);
     conn.send({ t:'hello', name: me.name, color: me.color });
     setOnline(conn.peer, true);
   });
-  conn.on('data', d => onData(conn.peer, d));
+  conn.on('data', d => {
+    console.log('Data from', conn.peer, d);
+    onData(conn.peer, d);
+  });
   conn.on('close', () => {
+    console.log('Connection CLOSED with', conn.peer);
     setOnline(conn.peer, false);
     delete conns[conn.peer];
     const c = contacts.find(c => c.peerId === conn.peer);
     if (c) setTimeout(() => dial(c), 8000);
   });
-  conn.on('error', () => {});
+  conn.on('error', e => {
+    console.error('Connection error with', conn.peer, e);
+    delete conns[conn.peer];
+  });
 }
 
 // ═══════════════════════════════════
