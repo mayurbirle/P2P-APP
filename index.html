@@ -35,14 +35,12 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 #search:focus{border-color:rgba(34,197,94,0.4)}#search::placeholder{color:var(--text3)}
 #contacts-list{flex:1;overflow-y:auto;padding:4px 0}
 .contact-row{display:flex;align-items:center;gap:10px;padding:9px 14px;cursor:pointer;transition:background .12s;position:relative}
-.contact-row:hover{background:var(--bg3)}
-.contact-row.active{background:var(--accent-glow2)}
+.contact-row:hover{background:var(--bg3)}.contact-row.active{background:var(--accent-glow2)}
 .contact-row.active::before{content:'';position:absolute;left:0;top:8px;bottom:8px;width:3px;background:var(--accent);border-radius:0 3px 3px 0}
 .c-avatar{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;flex-shrink:0;position:relative}
 .online-pip{position:absolute;bottom:1px;right:1px;width:9px;height:9px;border-radius:50%;border:2px solid var(--bg2);background:var(--text3)}
 .online-pip.on{background:var(--accent)}
-.c-info{flex:1;min-width:0}
-.c-name{font-weight:500;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.c-info{flex:1;min-width:0}.c-name{font-weight:500;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .c-preview{font-size:11px;color:var(--text2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px}
 .c-meta{display:flex;flex-direction:column;align-items:flex-end;gap:3px;flex-shrink:0}
 .c-time{font-size:10px;color:var(--text3);font-family:var(--mono)}
@@ -57,20 +55,16 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 .btn-xs.primary{background:var(--accent);color:#071a0e}.btn-xs.primary:hover{background:var(--accent-dark)}
 .btn-xs.ghost{background:var(--bg4);color:var(--text2)}.btn-xs.ghost:hover{background:var(--bg5);color:var(--text)}
 #welcome{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;color:var(--text3);text-align:center;padding:40px}
-.welcome-icon{font-size:52px;margin-bottom:4px}
-#welcome h2{font-size:20px;font-weight:600;color:var(--text2)}
+.welcome-icon{font-size:52px;margin-bottom:4px}#welcome h2{font-size:20px;font-weight:600;color:var(--text2)}
 #welcome p{font-size:13px;line-height:1.7;max-width:260px}
 #chat-view{display:none;flex-direction:column;height:100%}
 #chat-hdr{padding:12px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;background:var(--bg2);flex-shrink:0}
 #hdr-avatar{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0}
-#hdr-name{font-weight:600;font-size:14px}
-#hdr-status{font-size:11px;color:var(--text3);font-family:var(--mono);margin-top:1px}
-.chat-hdr-actions{display:flex;gap:6px;margin-left:auto}
-#back-btn{display:none;margin-right:4px}
+#hdr-name{font-weight:600;font-size:14px}#hdr-status{font-size:11px;color:var(--text3);font-family:var(--mono);margin-top:1px}
+.chat-hdr-actions{display:flex;gap:6px;margin-left:auto}#back-btn{display:none;margin-right:4px}
 #messages{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:2px}
 .date-sep{text-align:center;font-size:10px;color:var(--text3);font-family:var(--mono);letter-spacing:.06em;margin:12px 0 6px;text-transform:uppercase}
-.msg-group{display:flex;flex-direction:column;margin-bottom:6px}
-.msg-group.me{align-items:flex-end}.msg-group.them{align-items:flex-start}
+.msg-group{display:flex;flex-direction:column;margin-bottom:6px}.msg-group.me{align-items:flex-end}.msg-group.them{align-items:flex-start}
 .bubble{max-width:68%;padding:8px 12px;font-size:13px;line-height:1.55;word-break:break-word;position:relative}
 .me .bubble{background:var(--me-bubble);border:1px solid var(--me-border);border-radius:14px 4px 14px 14px;color:#c8f0dc}
 .them .bubble{background:var(--them-bubble);border:1px solid var(--them-border);border-radius:4px 14px 14px 14px;color:var(--text)}
@@ -81,11 +75,9 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 .file-dl{display:inline-block;margin-top:3px;font-size:11px;color:var(--accent);cursor:pointer;text-decoration:none}
 .prog-wrap{height:2px;background:var(--bg4);border-radius:1px;margin-top:5px}
 .prog-bar{height:100%;background:var(--accent);border-radius:1px;width:0%;transition:width .1s}
-.bubble img{max-width:210px;max-height:180px;border-radius:8px;display:block;cursor:pointer;transition:opacity .15s}
-.bubble img:hover{opacity:.9}
+.bubble img{max-width:210px;max-height:180px;border-radius:8px;display:block;cursor:pointer;transition:opacity .15s}.bubble img:hover{opacity:.9}
 .msg-footer{display:flex;align-items:center;gap:4px;padding:0 2px;margin-top:2px}
-.msg-time{font-size:10px;color:var(--text3);font-family:var(--mono)}
-.receipt{font-size:10px;color:var(--accent)}
+.msg-time{font-size:10px;color:var(--text3);font-family:var(--mono)}.receipt{font-size:10px;color:var(--accent)}
 .typing-wrap{display:flex;align-items:center;gap:4px;padding:9px 13px;background:var(--them-bubble);border:1px solid var(--them-border);border-radius:4px 14px 14px 14px;width:fit-content;margin-bottom:6px}
 .td{width:5px;height:5px;background:var(--text3);border-radius:50%;animation:td 1.1s infinite ease-in-out}
 .td:nth-child(2){animation-delay:.18s}.td:nth-child(3){animation-delay:.36s}
@@ -93,15 +85,13 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 #offline-bar{padding:7px 16px;text-align:center;background:rgba(245,166,35,0.08);border-top:1px solid rgba(245,166,35,0.15);font-size:11px;color:var(--warn);display:none;flex-shrink:0}
 #input-bar{padding:10px 12px;border-top:1px solid var(--border);background:var(--bg2);display:flex;align-items:flex-end;gap:8px;flex-shrink:0}
 #attach-btn{width:34px;height:34px;border-radius:8px;border:1px solid var(--border);background:var(--bg3);color:var(--text2);font-size:16px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .15s;flex-shrink:0}
-#attach-btn:hover{background:var(--bg4);color:var(--text)}
-#file-input{display:none}
+#attach-btn:hover{background:var(--bg4);color:var(--text)}#file-input{display:none}
 #msg-input{flex:1;min-width:0;background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:8px 12px;color:var(--text);font-family:var(--font);font-size:13px;outline:none;resize:none;max-height:110px;line-height:1.5;transition:border-color .15s}
 #msg-input:focus{border-color:rgba(34,197,94,0.35)}#msg-input::placeholder{color:var(--text3)}
 #send-btn{width:36px;height:36px;border-radius:50%;border:none;background:var(--accent);color:#071a0e;display:flex;align-items:center;justify-content:center;font-size:15px;cursor:pointer;flex-shrink:0;transition:all .15s}
 #send-btn:hover{background:var(--accent-dark);transform:scale(1.05)}
 #call-screen{position:absolute;inset:0;background:#000;z-index:40;display:none;flex-direction:column;align-items:center;justify-content:center;gap:20px}
-#call-screen.show{display:flex}
-#remote-vid{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;background:#111}
+#call-screen.show{display:flex}#remote-vid{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;background:#111}
 #local-vid{position:absolute;top:16px;right:16px;width:110px;height:80px;border-radius:10px;object-fit:cover;background:#222;border:1.5px solid var(--border);z-index:1}
 .call-ui{position:relative;z-index:2;text-align:center}.call-cname{font-size:26px;font-weight:700}.call-cstatus{font-size:12px;color:var(--text2);font-family:var(--mono);margin-top:4px}
 .call-controls{position:relative;z-index:2;display:flex;gap:14px}
@@ -113,14 +103,13 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 @keyframes ring{0%,100%{box-shadow:0 0 0 0 rgba(34,197,94,.5)}60%{box-shadow:0 0 0 18px rgba(34,197,94,0)}}
 .inc-name{font-size:20px;font-weight:700}.inc-sub{font-size:12px;color:var(--text2);font-family:var(--mono)}
 .inc-btns{display:flex;gap:20px;margin-top:8px}
-.inc-accept{width:58px;height:58px;border-radius:50%;background:var(--accent);border:none;color:#071a0e;font-size:22px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:transform .15s}
-.inc-reject{width:58px;height:58px;border-radius:50%;background:var(--danger);border:none;color:#fff;font-size:22px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:transform .15s}
+.inc-accept,.inc-reject{width:58px;height:58px;border-radius:50%;border:none;font-size:22px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:transform .15s}
+.inc-accept{background:var(--accent);color:#071a0e}.inc-reject{background:var(--danger);color:#fff}
 .overlay{position:fixed;inset:0;background:rgba(0,0,0,0.6);backdrop-filter:blur(8px);z-index:100;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .2s}
 .overlay.show{opacity:1;pointer-events:all}
-.modal{background:var(--bg2);border:1px solid var(--border2);border-radius:18px;padding:28px;width:min(400px,92vw);transform:scale(.97) translateY(8px);transition:transform .25s;box-shadow:0 30px 80px rgba(0,0,0,0.6);max-height:90vh;overflow-y:auto}
+.modal{background:var(--bg2);border:1px solid var(--border2);border-radius:18px;padding:28px;width:min(420px,92vw);transform:scale(.97) translateY(8px);transition:transform .25s;box-shadow:0 30px 80px rgba(0,0,0,0.6);max-height:90vh;overflow-y:auto}
 .overlay.show .modal{transform:scale(1) translateY(0)}
-.modal h2{font-size:18px;font-weight:700;margin-bottom:4px}
-.modal .sub{font-size:12px;color:var(--text2);margin-bottom:22px;line-height:1.6}
+.modal h2{font-size:18px;font-weight:700;margin-bottom:4px}.modal .sub{font-size:12px;color:var(--text2);margin-bottom:22px;line-height:1.6}
 .field-label{font-size:10px;color:var(--text3);font-family:var(--mono);letter-spacing:.07em;text-transform:uppercase;margin-bottom:5px}
 .field-input{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:9px;padding:9px 12px;color:var(--text);font-family:var(--font);font-size:14px;outline:none;transition:border-color .15s;margin-bottom:16px;display:block}
 .field-input:focus{border-color:rgba(34,197,94,.45)}
@@ -133,14 +122,15 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 .color-grid{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px}
 .color-swatch{width:32px;height:32px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;border:2px solid transparent;transition:all .15s}
 .color-swatch:hover{transform:scale(1.1)}.color-swatch.active{border-color:#fff;transform:scale(1.12)}
-.tab-row{display:flex;gap:4px;margin-bottom:16px;background:var(--bg3);border-radius:9px;padding:3px}
-.tab{flex:1;padding:6px;border-radius:7px;border:none;background:transparent;color:var(--text2);font-family:var(--font);font-size:12px;cursor:pointer;transition:all .15s;font-weight:500}
-.tab.active{background:var(--bg4);color:var(--text)}
-.share-url{background:var(--bg3);border:1px solid var(--border);border-radius:9px;padding:11px 13px;font-family:var(--mono);font-size:11px;color:var(--accent);word-break:break-all;margin-bottom:12px;cursor:pointer;transition:background .15s;line-height:1.6}
-.share-url:hover{background:var(--bg4)}
-.qr-box{background:#fff;border-radius:12px;padding:12px;display:flex;justify-content:center;margin:4px 0 14px}
-
-/* DEBUG PANEL */
+.code-area{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:9px;padding:10px 12px;color:var(--accent);font-family:var(--mono);font-size:10px;line-height:1.4;resize:none;outline:none;margin-bottom:12px;word-break:break-all;min-height:80px;max-height:140px;overflow-y:auto}
+.code-area:focus{border-color:rgba(34,197,94,.45)}
+.code-area::placeholder{color:var(--text3);font-family:var(--font);font-size:12px}
+.step-num{display:inline-flex;width:22px;height:22px;border-radius:50%;background:var(--accent);color:#071a0e;font-size:11px;font-weight:700;align-items:center;justify-content:center;margin-right:6px;flex-shrink:0}
+.step-row{display:flex;align-items:flex-start;gap:4px;margin-bottom:12px;font-size:13px;color:var(--text2);line-height:1.6}
+.conn-status{font-size:11px;font-family:var(--mono);padding:8px 12px;border-radius:8px;margin-bottom:12px;text-align:center}
+.conn-status.waiting{background:rgba(245,166,35,0.08);color:var(--warn);border:1px solid rgba(245,166,35,0.15)}
+.conn-status.ok{background:rgba(34,197,94,0.08);color:var(--accent);border:1px solid rgba(34,197,94,0.15)}
+.conn-status.err{background:rgba(240,64,64,0.08);color:var(--danger);border:1px solid rgba(240,64,64,0.15)}
 #debug-panel{position:fixed;bottom:0;left:0;right:0;background:rgba(0,0,0,0.95);border-top:2px solid var(--accent);z-index:200;display:none;flex-direction:column;max-height:50vh;font-family:var(--mono);font-size:11px}
 #debug-panel.show{display:flex}
 #debug-header{display:flex;align-items:center;justify-content:space-between;padding:6px 12px;border-bottom:1px solid var(--border);flex-shrink:0}
@@ -152,14 +142,9 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 #debug-btns{display:flex;gap:4px}
 #debug-btns button{background:var(--bg4);color:var(--text2);border:1px solid var(--border);border-radius:5px;padding:3px 8px;cursor:pointer;font-family:var(--mono);font-size:10px}
 #debug-btns button:hover{background:var(--bg5);color:var(--text)}
-
 #toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(10px);background:var(--bg3);border:1px solid var(--border2);border-radius:10px;padding:9px 16px;font-size:12px;color:var(--text);z-index:999;opacity:0;transition:all .2s;pointer-events:none;white-space:nowrap}
 #toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
-@media(max-width:620px){
-  #sidebar{position:absolute;inset:0;z-index:20;transition:transform .25s}
-  #sidebar.slide-out{transform:translateX(-100%)}
-  #back-btn{display:flex !important}
-}
+@media(max-width:620px){#sidebar{position:absolute;inset:0;z-index:20;transition:transform .25s}#sidebar.slide-out{transform:translateX(-100%)}#back-btn{display:flex !important}}
 </style>
 </head>
 <body>
@@ -169,14 +154,14 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
       <div class="my-avatar" id="my-avatar" onclick="openProfileModal()"></div>
       <div style="flex:1;min-width:0"><div id="my-name">…</div><div id="peer-status">initializing</div></div>
       <div class="icon-btn" onclick="toggleDebug()" title="Debug log" style="font-size:12px">🐛</div>
-      <div class="icon-btn" onclick="openShareModal()" title="Share contact link" style="font-size:14px">＋</div>
+      <div class="icon-btn" onclick="openAddModal()" title="Add contact" style="font-size:14px">＋</div>
     </div>
-    <div id="add-banner"><p>Add <strong id="banner-name"></strong> as a contact?</p><div class="banner-btns"><button class="btn-xs primary" onclick="confirmAdd()">Add contact</button><button class="btn-xs ghost" onclick="dismissBanner()">Dismiss</button></div></div>
+    <div id="add-banner"><p>Add <strong id="banner-name"></strong> as a contact?</p><div class="banner-btns"><button class="btn-xs primary" onclick="confirmBannerAdd()">Add contact</button><button class="btn-xs ghost" onclick="dismissBanner()">Dismiss</button></div></div>
     <div id="search-wrap"><input id="search" type="text" placeholder="Search…" oninput="filterContacts(this.value)"/></div>
     <div id="contacts-list"></div>
   </div>
   <div id="main">
-    <div id="welcome"><div class="welcome-icon">🌊</div><h2>Wave</h2><p>Tap ＋ to share your link and add friends. No accounts needed.</p></div>
+    <div id="welcome"><div class="welcome-icon">🌊</div><h2>Wave</h2><p>Tap ＋ to add a friend. Exchange codes via WhatsApp or any messenger.</p></div>
     <div id="chat-view">
       <div id="chat-hdr"><div class="icon-btn" id="back-btn" onclick="closeChat()" style="display:none">←</div><div id="hdr-avatar"></div><div style="flex:1;min-width:0"><div id="hdr-name"></div><div id="hdr-status"></div></div><div class="chat-hdr-actions"><div class="icon-btn" onclick="startCall(false)" title="Voice call">📞</div><div class="icon-btn" onclick="startCall(true)" title="Video call">📹</div></div></div>
       <div id="messages"></div>
@@ -190,26 +175,81 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 <div id="toast"></div>
 <div id="debug-panel"><div id="debug-header"><span>🐛 Debug Log</span><div id="debug-btns"><button onclick="resetAll()">Reset All</button><button onclick="document.getElementById('debug-log').innerHTML=''">Clear</button><button onclick="copyDebugLog()">Copy</button><button onclick="toggleDebug()">Close</button></div></div><div id="debug-log"></div></div>
 
+<!-- Setup Modal -->
 <div class="overlay show" id="setup-overlay"><div class="modal"><div style="text-align:center;font-size:42px;margin-bottom:14px">🌊</div><h2 style="text-align:center">Welcome to Wave</h2><p class="sub" style="text-align:center">P2P messaging — no servers, no accounts, just you and your friends.</p><div class="field-label">Your name</div><input class="field-input" id="setup-name" type="text" placeholder="e.g. Alice" maxlength="30"/><div class="field-label">Your color</div><div class="color-grid" id="setup-color-grid"></div><button class="btn primary full" onclick="completeSetup()">Start chatting →</button></div></div>
-<div class="overlay" id="share-overlay" onclick="bgClose(event,'share-overlay')"><div class="modal"><h2>Share your link</h2><p class="sub">Send this to a friend. When they open it, they can add you in one tap.</p><div class="tab-row"><button class="tab active" onclick="switchTab('link',this)">Link</button><button class="tab" onclick="switchTab('qr',this)">QR Code</button></div><div id="tab-link"><div class="share-url" id="share-url-text" onclick="copyLink()">—</div><div id="share-embedded-notice" style="display:none;font-size:12px;color:var(--warn);background:rgba(245,166,35,0.08);border:1px solid rgba(245,166,35,0.2);border-radius:8px;padding:10px 12px;margin-bottom:12px;line-height:1.6">⚠️ Save this file and open it in your browser directly (not inside Claude). Then share the URL with your friend.</div><div style="display:flex;gap:8px" id="share-copy-btn"><button class="btn primary" style="flex:1" onclick="copyLink()">Copy link</button><button class="btn secondary" onclick="closeOverlay('share-overlay')">Done</button></div></div><div id="tab-qr" style="display:none"><div class="qr-box"><div id="qr-container"></div></div><button class="btn secondary full" onclick="closeOverlay('share-overlay')">Done</button></div></div></div>
+
+<!-- Add Contact Modal -->
+<div class="overlay" id="add-overlay" onclick="bgClose(event,'add-overlay')">
+  <div class="modal">
+    <h2 id="add-modal-title">Add Contact</h2>
+    <p class="sub" id="add-modal-sub">Choose how to connect with your friend.</p>
+
+    <!-- Step 0: Choose mode -->
+    <div id="add-step0">
+      <button class="btn primary full" style="margin-bottom:10px" onclick="startPeerJSAdd()">🔄 Auto-connect (PeerJS)</button>
+      <button class="btn secondary full" style="margin-bottom:10px" onclick="startManualOffer()">📋 Manual connect (copy-paste codes)</button>
+      <button class="btn secondary full" onclick="showPasteAnswer()">📥 Paste friend's invite code</button>
+    </div>
+
+    <!-- PeerJS mode: share link -->
+    <div id="add-peerjs" style="display:none">
+      <div class="conn-status waiting" id="peerjs-status">Connecting to signaling server…</div>
+      <div class="field-label">Your invite link</div>
+      <div class="code-area" id="peerjs-link" style="cursor:pointer;min-height:40px" onclick="copyPeerJSLink()">Generating…</div>
+      <p style="font-size:11px;color:var(--text3);margin-bottom:12px">Share this link with your friend. When they open it, you'll auto-connect.</p>
+      <div style="display:flex;gap:8px">
+        <button class="btn primary" style="flex:1" onclick="copyPeerJSLink()">Copy link</button>
+        <button class="btn secondary" onclick="cancelAdd()">Cancel</button>
+      </div>
+    </div>
+
+    <!-- Manual Step 1: Create offer -->
+    <div id="add-step1" style="display:none">
+      <div class="conn-status waiting" id="manual-status1">Generating offer…</div>
+      <div class="step-row"><span class="step-num">1</span>Copy this code and send it to your friend:</div>
+      <textarea class="code-area" id="offer-out" readonly onclick="this.select();copyOffer()"></textarea>
+      <button class="btn primary full" style="margin-bottom:12px" onclick="copyOffer()">Copy invite code</button>
+      <div class="step-row"><span class="step-num">2</span>Paste your friend's response code here:</div>
+      <textarea class="code-area" id="answer-in" placeholder="Paste their response code here…"></textarea>
+      <div style="display:flex;gap:8px">
+        <button class="btn primary" style="flex:1" onclick="submitAnswer()">Connect</button>
+        <button class="btn secondary" onclick="cancelAdd()">Cancel</button>
+      </div>
+    </div>
+
+    <!-- Manual Step 2: Paste offer, generate answer -->
+    <div id="add-step2" style="display:none">
+      <div class="conn-status waiting" id="manual-status2">Waiting for invite code…</div>
+      <div class="step-row"><span class="step-num">1</span>Paste your friend's invite code:</div>
+      <textarea class="code-area" id="offer-in" placeholder="Paste their invite code here…"></textarea>
+      <button class="btn primary full" style="margin-bottom:12px" onclick="processOffer()">Generate response</button>
+      <div id="answer-section" style="display:none">
+        <div class="step-row"><span class="step-num">2</span>Send this response code back to your friend:</div>
+        <textarea class="code-area" id="answer-out" readonly onclick="this.select();copyAnswer()"></textarea>
+        <button class="btn primary full" onclick="copyAnswer()">Copy response code</button>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:12px">
+        <button class="btn secondary" style="flex:1" onclick="cancelAdd()">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Profile Modal -->
 <div class="overlay" id="profile-overlay" onclick="bgClose(event,'profile-overlay')"><div class="modal"><h2>Edit profile</h2><p class="sub">Changes save locally and notify your online contacts.</p><div class="field-label">Name</div><input class="field-input" id="profile-name" type="text" maxlength="30"/><div class="field-label">Color</div><div class="color-grid" id="profile-color-grid"></div><div class="modal-btns"><button class="btn secondary" onclick="closeOverlay('profile-overlay')">Cancel</button><button class="btn primary" onclick="saveProfile()">Save</button></div></div></div>
-<div class="overlay" id="delete-overlay" onclick="bgClose(event,'delete-overlay')"><div class="modal" style="text-align:center"><h2>Delete contact?</h2><p class="sub">This will remove <strong id="del-name"></strong> and all chat history with them.</p><div class="modal-btns" style="justify-content:center"><button class="btn secondary" onclick="closeOverlay('delete-overlay')">Cancel</button><button class="btn danger" onclick="confirmDelete()">Delete</button></div></div></div>
+
+<!-- Delete Modal -->
+<div class="overlay" id="delete-overlay" onclick="bgClose(event,'delete-overlay')"><div class="modal" style="text-align:center"><h2>Delete contact?</h2><p class="sub">This will remove <strong id="del-name"></strong> and all chat history.</p><div class="modal-btns" style="justify-content:center"><button class="btn secondary" onclick="closeOverlay('delete-overlay')">Cancel</button><button class="btn danger" onclick="confirmDelete()">Delete</button></div></div></div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <script>
 function loadScript(s,c){const e=document.createElement('script');e.src=s;e.onload=()=>{dlog('ok','Loaded: '+s);c&&c()};e.onerror=()=>{dlog('err','FAILED: '+s);c&&c()};document.body.appendChild(e)}
-loadScript('https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js',()=>{window._libsReady=true;if(window._pendingInit)window._pendingInit()});
+loadScript('https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js',()=>{window._peerJSReady=true;dlog('ok','PeerJS library loaded')});
 </script>
 <script>
 // ═══ DEBUG ═══
 const _dlines=[];
-function dlog(lv,msg){
-  const ts=new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit',second:'2-digit'});
-  _dlines.push(`[${ts}][${lv}] ${msg}`);if(_dlines.length>500)_dlines.shift();
-  const el=document.getElementById('debug-log');
-  if(el){const d=document.createElement('div');d.className=`dlog ${lv}`;d.innerHTML=`<span class="dt">${ts}</span>${esc(msg)}`;el.appendChild(d);el.scrollTop=el.scrollHeight}
-  (lv==='err'?console.error:lv==='warn'?console.warn:console.log)(`[Wave:${lv}] ${msg}`);
-}
+function dlog(lv,msg){const ts=new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit',second:'2-digit'});_dlines.push(`[${ts}][${lv}] ${msg}`);if(_dlines.length>500)_dlines.shift();const el=document.getElementById('debug-log');if(el){const d=document.createElement('div');d.className=`dlog ${lv}`;d.innerHTML=`<span class="dt">${ts}</span>${esc(msg)}`;el.appendChild(d);el.scrollTop=el.scrollHeight}(lv==='err'?console.error:lv==='warn'?console.warn:console.log)(`[Wave:${lv}] ${msg}`)}
 function toggleDebug(){document.getElementById('debug-panel').classList.toggle('show')}
 function copyDebugLog(){navigator.clipboard.writeText(_dlines.join('\n')).then(()=>toast('Copied!')).catch(()=>toast('Failed'))}
 function resetAll(){if(!confirm('Clear ALL data?'))return;['wave_me','wave_contacts','wave_messages','wave_unread','wave_pending'].forEach(k=>localStorage.removeItem(k));location.reload()}
@@ -220,226 +260,304 @@ const PAL_BG=['#071a0e','#071526','#1f0709','#1f1507','#170b26','#021419','#2607
 const CHUNK=16384;
 
 // ═══ STATE ═══
-let me=null,peer=null,contacts=[],conns={},messages={},unread={},activeId=null;
+let me=null,peer=null,contacts=[],conns={},dataChannels={},messages={},unread={},activeId=null;
 let typingTimers={},typingDebounce=null,currentCall=null,localStream=null,pendingCall=null;
 let fileXfers={},setupColorIdx=0,profileColorIdx=0,pendingMsgs={},keepAliveId=null,deletePeerId=null;
+let peerJSMode=false,peerJSReady=false,peerJSFailed=false;
+let manualPC=null,manualDC=null,manualPeerId=null;
+let cachedICE=null;
+
+// ═══ ICE SERVERS — Cloudflare TURN ═══
+async function getICEServers(){
+  if(cachedICE && cachedICE.ts > Date.now()-3600000) return cachedICE.servers;
+  dlog('info','Fetching Cloudflare TURN credentials…');
+  try{
+    const r=await fetch('https://speed.cloudflare.com/turn-creds');
+    const d=await r.json();
+    const servers=[
+      {urls:'stun:stun.l.google.com:19302'},
+      {urls:'stun:stun1.l.google.com:19302'},
+      {urls:'stun:stun.cloudflare.com:3478'},
+      {urls:d.urls.filter(u=>u.startsWith('turn:')),username:d.username,credential:d.credential},
+      {urls:d.urls.filter(u=>u.startsWith('turns:')),username:d.username,credential:d.credential},
+    ];
+    cachedICE={servers,ts:Date.now()};
+    dlog('ok','✓ Cloudflare TURN credentials obtained');
+    return servers;
+  }catch(e){
+    dlog('warn','Cloudflare TURN fetch failed, using STUN only: '+e.message);
+    return [{urls:'stun:stun.l.google.com:19302'},{urls:'stun:stun1.l.google.com:19302'},{urls:'stun:stun.cloudflare.com:3478'}];
+  }
+}
 
 // ═══ BOOT ═══
 window.addEventListener('load',()=>{
-  dlog('info','App loading…');
+  dlog('info','Wave loading…');
   me=JSON.parse(localStorage.getItem('wave_me')||'null');
   contacts=JSON.parse(localStorage.getItem('wave_contacts')||'[]');
   messages=JSON.parse(localStorage.getItem('wave_messages')||'{}');
   unread=JSON.parse(localStorage.getItem('wave_unread')||'{}');
   pendingMsgs=JSON.parse(localStorage.getItem('wave_pending')||'{}');
   buildColorGrids();
-  if(me){
-    dlog('info',`Profile: "${me.name}" id=${me.peerId}`);
-    dlog('info',`Contacts: ${contacts.length}`);
-    contacts.forEach(c=>dlog('info',`  → ${c.name} (${c.peerId.substring(0,16)}…)`));
-    closeOverlay('setup-overlay');
-    startApp();
-  } else {
-    dlog('info','No profile — showing setup');
-    document.getElementById('setup-name').focus();
-  }
+  if(me){dlog('info',`Profile: "${me.name}" id=${me.peerId}`);closeOverlay('setup-overlay');startApp()}
+  else{dlog('info','No profile');document.getElementById('setup-name').focus()}
 });
-
-function startApp(){renderSidebarMe();renderContacts();checkAddLink();if(window._libsReady)initPeer();else{dlog('info','Waiting for PeerJS…');window._pendingInit=initPeer}}
+function startApp(){
+  renderSidebarMe();renderContacts();checkAddLink();
+  // Try PeerJS in background
+  initPeerJS();
+}
 
 // ═══ COLORS ═══
 function buildColorGrids(){buildGrid('setup-color-grid',0);buildGrid('profile-color-grid',me?.color||0)}
 function buildGrid(id,ai){document.getElementById(id).innerHTML=PALETTE.map((c,i)=>`<div class="color-swatch${i===ai?' active':''}" style="background:${c};color:${PAL_BG[i]}" onclick="pickColor(this,'${id}',${i})">●</div>`).join('')}
 function pickColor(el,gid,idx){document.querySelectorAll(`#${gid} .color-swatch`).forEach(e=>e.classList.remove('active'));el.classList.add('active');if(gid==='setup-color-grid')setupColorIdx=idx;else profileColorIdx=idx}
 
-// ═══ PEER INIT ═══
-function initPeer(){
-  dlog('info','═══ initPeer() ═══');
+// ═══════════════════════════════════════════
+// MODE A: PeerJS (auto signaling)
+// ═══════════════════════════════════════════
+let _peerJSAttempts=0;
+function initPeerJS(){
+  if(!window._peerJSReady){dlog('info','Waiting for PeerJS lib…');setTimeout(initPeerJS,500);return}
+  _peerJSAttempts++;
+  if(_peerJSAttempts>3){dlog('warn','PeerJS failed after 3 attempts — use Manual Connect');peerJSFailed=true;setStatus('manual mode');return}
+  dlog('info',`PeerJS attempt ${_peerJSAttempts}/3…`);
   setStatus('connecting…');
-  if(keepAliveId){clearInterval(keepAliveId);keepAliveId=null}
   if(peer&&!peer.destroyed){try{peer.destroy()}catch(e){}}
   peer=null;
-  Object.keys(conns).forEach(pid=>{try{conns[pid].close()}catch(e){}});
-  conns={};
 
-  let tryId=me.peerId;
-  if(!tryId||!/^[a-zA-Z0-9_-]+$/.test(tryId)){
-    dlog('warn',`Bad peerId "${tryId}", generating new`);
-    tryId=genId();me.peerId=tryId;localStorage.setItem('wave_me',JSON.stringify(me));
-  }
-  dlog('info',`PeerId: ${tryId}`);
-
-  // ONLY reliable free STUN servers - no fake TURN credentials
-  const iceServers=[
-    {urls:'stun:stun.l.google.com:19302'},
-    {urls:'stun:stun1.l.google.com:19302'},
-    {urls:'stun:stun2.l.google.com:19302'},
-    {urls:'stun:stun3.l.google.com:19302'},
-    {urls:'stun:stun4.l.google.com:19302'},
-    {urls:'stun:global.stun.twilio.com:3478'},
-    {urls:'stun:stun.cloudflare.com:3478'},
-  ];
-  dlog('info',`ICE: ${iceServers.length} STUN servers (no TURN — STUN works for most home networks)`);
-
-  try{
-    peer=new Peer(tryId,{debug:0,config:{iceServers}});
-  }catch(e){
-    dlog('err',`Peer constructor FAILED: ${e.message}`);
-    setStatus('error — retrying…');setTimeout(initPeer,3000);return;
-  }
-  dlog('info','Peer created, connecting to PeerJS signaling server (0.peerjs.com)…');
-
-  peer.on('open',id=>{
-    dlog('ok',`✓ SIGNALING CONNECTED! Server assigned ID: ${id}`);
-    if(id!==me.peerId){dlog('warn',`ID changed: ${me.peerId} → ${id}`);me.peerId=id;localStorage.setItem('wave_me',JSON.stringify(me));renderSidebarMe()}
-    setStatus('online ✓');
-    if(contacts.length){
-      dlog('info',`Dialing ${contacts.length} contacts…`);
-      contacts.forEach((c,i)=>setTimeout(()=>dial(c),500+i*300));
-    }
-    keepAliveId=setInterval(()=>{
-      contacts.forEach(c=>{
-        const cn=conns[c.peerId];
-        if(cn&&cn.open){try{cn.send({t:'ping'})}catch(e){dlog('warn',`Ping fail ${c.name}`);delete conns[c.peerId];setOnline(c.peerId,false)}}
-        else dial(c);
-      });
-    },12000);
-  });
-
-  peer.on('connection',conn=>{
-    dlog('info',`◀ INCOMING connection from: ${conn.peer.substring(0,16)}…`);
-    const ex=conns[conn.peer];
-    if(ex&&ex.open){
-      if(me.peerId>conn.peer){dlog('info','Dedup: keeping ours');conn.close();return}
-      else{dlog('info','Dedup: replacing with incoming');try{ex.close()}catch(e){}}
-    }
-    setupConn(conn,false);
-  });
-
-  peer.on('call',call=>onIncomingCall(call));
-
-  peer.on('disconnected',()=>{
-    dlog('warn','DISCONNECTED from signaling server');
-    setStatus('reconnecting…');
-    contacts.forEach(c=>setOnline(c.peerId,false));
-    setTimeout(()=>{
-      if(peer&&!peer.destroyed){dlog('info','Trying peer.reconnect()…');try{peer.reconnect()}catch(e){dlog('err','Reconnect failed');initPeer()}}
-      else initPeer();
-    },2500);
-  });
-
-  peer.on('error',e=>{
-    dlog('err',`PeerJS ERROR: type="${e.type}" → ${e.message}`);
-    if(e.type==='peer-unavailable'){
-      const pid=e.message?.match(/Could not connect to peer (.+)/)?.[1];
-      const c=contacts.find(c=>c.peerId===pid);
-      dlog('warn',`Peer unavailable: ${c?.name||pid} — retry in 15s`);
-      if(c)setTimeout(()=>dial(c),15000);return;
-    }
-    if(e.type==='unavailable-id'){
-      dlog('warn','ID taken! Generating new…');
-      me.peerId=genId();localStorage.setItem('wave_me',JSON.stringify(me));renderSidebarMe();
-      setTimeout(initPeer,1500);return;
-    }
-    if(['network','server-error','socket-error','socket-closed'].includes(e.type)){
-      dlog('warn',`Network issue (${e.type}), retry in 4s`);setStatus('connection issue…');
-      setTimeout(()=>{if(peer&&!peer.destroyed)try{peer.reconnect()}catch(ex){initPeer()}else initPeer()},4000);return;
-    }
-    setStatus('error');setTimeout(initPeer,5000);
-  });
-}
-
-function dial(contact){
-  if(!peer||peer.destroyed||peer.disconnected)return;
-  if(!contact?.peerId)return;
-  const ex=conns[contact.peerId];
-  if(ex&&ex.open)return;
-  if(ex){try{ex.close()}catch(e){}delete conns[contact.peerId]}
-  dlog('info',`▶ DIALING ${contact.name} (${contact.peerId.substring(0,16)}…)`);
-  try{
-    const conn=peer.connect(contact.peerId,{reliable:true});
-    if(!conn){dlog('err','peer.connect returned null!');return}
-    setupConn(conn,true);
-  }catch(e){dlog('err',`Dial error: ${e.message}`)}
-}
-
-function setupConn(conn,weInit){
-  const dir=weInit?'OUT':'IN';
-  dlog('info',`setupConn [${dir}] peer=${conn.peer.substring(0,16)}…`);
-  conns[conn.peer]=conn;
-
-  conn.on('open',()=>{
-    const c=contacts.find(c=>c.peerId===conn.peer);
-    dlog('ok',`✓ DATA CHANNEL OPEN [${dir}] with ${c?.name||conn.peer.substring(0,16)}…`);
-    try{conn.send({t:'hello',name:me.name,color:me.color,peerId:me.peerId});dlog('info','Sent hello')}catch(e){dlog('err','Hello send failed: '+e.message)}
-    setOnline(conn.peer,true);
-    flushPending(conn.peer);
-  });
-
-  conn.on('data',d=>{
-    if(d&&d.t!=='ping'&&d.t!=='pong')dlog('info',`📩 [${dir}] data type=${d.t} from ${conn.peer.substring(0,16)}…`);
-    onData(conn.peer,d);
-  });
-
-  conn.on('close',()=>{
-    dlog('warn',`Connection CLOSED [${dir}] ${conn.peer.substring(0,16)}…`);
-    if(conns[conn.peer]===conn){delete conns[conn.peer];setOnline(conn.peer,false);
-      const c=contacts.find(c=>c.peerId===conn.peer);
-      if(c){dlog('info',`Retry ${c.name} in 6s`);setTimeout(()=>dial(c),6000)}
-    }
-  });
-
-  conn.on('error',e=>{
-    dlog('err',`Connection ERROR [${dir}] ${conn.peer.substring(0,16)}…: ${e.type||e.message||e}`);
-    if(conns[conn.peer]===conn){delete conns[conn.peer];setOnline(conn.peer,false)}
-  });
-
-  // ICE monitoring
-  setTimeout(()=>{
+  getICEServers().then(iceServers=>{
     try{
-      const pc=conn.peerConnection||conn._peerConnection;
-      if(!pc){dlog('warn',`No peerConnection yet for [${dir}] — will check ICE later`);return}
-      dlog('info',`ICE monitoring attached [${dir}] — current state: ${pc.iceConnectionState}`);
-      pc.addEventListener('iceconnectionstatechange',()=>{
-        const st=pc.iceConnectionState;
-        const c=contacts.find(c=>c.peerId===conn.peer);
-        const nm=c?.name||conn.peer.substring(0,12);
-        if(st==='connected'||st==='completed')dlog('ok',`✓ ICE ${st} with ${nm}`);
-        else if(st==='failed'){dlog('err',`✗ ICE FAILED with ${nm} — likely symmetric NAT. Need TURN server.`);dlog('err','Both devices may be on mobile/carrier NAT. Try: same WiFi, or add a TURN server.')}
-        else if(st==='disconnected')dlog('warn',`ICE disconnected with ${nm}`);
-        else if(st==='checking')dlog('info',`ICE checking with ${nm}…`);
-        else dlog('info',`ICE state: ${st} with ${nm}`);
-      });
-      pc.addEventListener('icegatheringstatechange',()=>{dlog('info',`ICE gathering: ${pc.iceGatheringState} [${dir}]`)});
-      let candCount=0;
-      pc.addEventListener('icecandidate',evt=>{
-        if(evt.candidate){candCount++;const c=evt.candidate;dlog('info',`ICE candidate #${candCount}: ${c.type||'?'} ${c.protocol||'?'} ${c.address||'?'}:${c.port||'?'}`)}
-        else{dlog('info',`ICE gathering done [${dir}] — ${candCount} candidates total`)}
-      });
-    }catch(e){dlog('warn','ICE monitor error: '+e.message)}
-  },100);
+      peer=new Peer(me.peerId,{debug:0,config:{iceServers}});
+    }catch(e){dlog('err','Peer constructor: '+e.message);setTimeout(initPeerJS,2000);return}
+
+    const timeout=setTimeout(()=>{
+      if(!peerJSReady){dlog('warn','PeerJS open timeout');try{peer.destroy()}catch(e){}initPeerJS()}
+    },8000);
+
+    peer.on('open',id=>{
+      clearTimeout(timeout);
+      peerJSReady=true;peerJSFailed=false;_peerJSAttempts=0;
+      if(id!==me.peerId){me.peerId=id;localStorage.setItem('wave_me',JSON.stringify(me));renderSidebarMe()}
+      dlog('ok','✓ PeerJS online: '+id);
+      setStatus('online ✓');
+      contacts.forEach((c,i)=>setTimeout(()=>dialPeerJS(c),500+i*300));
+      if(keepAliveId)clearInterval(keepAliveId);
+      keepAliveId=setInterval(()=>{contacts.forEach(c=>{const cn=conns[c.peerId];if(cn&&cn.open){try{cn.send({t:'ping'})}catch(e){delete conns[c.peerId];setOnline(c.peerId,false)}}else if(peerJSReady)dialPeerJS(c)})},12000);
+    });
+    peer.on('connection',conn=>{dlog('info','◀ Incoming PeerJS from '+conn.peer.substring(0,16));setupPeerJSConn(conn)});
+    peer.on('call',call=>onIncomingCall(call));
+    peer.on('disconnected',()=>{
+      dlog('warn','PeerJS disconnected');peerJSReady=false;setStatus('reconnecting…');
+      setTimeout(()=>{if(peer&&!peer.destroyed)try{peer.reconnect()}catch(e){initPeerJS()}else initPeerJS()},3000);
+    });
+    peer.on('error',e=>{
+      dlog('err','PeerJS: '+e.type+' — '+e.message);
+      if(e.type==='peer-unavailable')return;
+      if(e.type==='unavailable-id'){me.peerId=genId();localStorage.setItem('wave_me',JSON.stringify(me));renderSidebarMe();setTimeout(initPeerJS,1500);return}
+      clearTimeout(timeout);peerJSReady=false;
+      setTimeout(initPeerJS,3000);
+    });
+  });
 }
 
-// ═══ DATA HANDLER ═══
+function dialPeerJS(contact){
+  if(!peer||peer.destroyed||!peerJSReady)return;
+  if(!contact?.peerId)return;
+  const ex=conns[contact.peerId];if(ex&&ex.open)return;
+  if(ex){try{ex.close()}catch(e){}delete conns[contact.peerId]}
+  dlog('info','▶ Dialing '+contact.name);
+  try{const conn=peer.connect(contact.peerId,{reliable:true});if(conn)setupPeerJSConn(conn)}catch(e){dlog('err','Dial: '+e.message)}
+}
+
+function setupPeerJSConn(conn){
+  conns[conn.peer]=conn;
+  conn.on('open',()=>{
+    dlog('ok','✓ PeerJS connected: '+conn.peer.substring(0,16));
+    try{conn.send({t:'hello',name:me.name,color:me.color})}catch(e){}
+    setOnline(conn.peer,true);flushPending(conn.peer);
+  });
+  conn.on('data',d=>onData(conn.peer,d));
+  conn.on('close',()=>{if(conns[conn.peer]===conn){delete conns[conn.peer];setOnline(conn.peer,false);const c=contacts.find(c=>c.peerId===conn.peer);if(c)setTimeout(()=>dialPeerJS(c),6000)}});
+  conn.on('error',e=>{dlog('err','Conn: '+e);if(conns[conn.peer]===conn){delete conns[conn.peer];setOnline(conn.peer,false)}});
+}
+
+// ═══════════════════════════════════════════
+// MODE B: Manual WebRTC signaling
+// ═══════════════════════════════════════════
+async function startManualOffer(){
+  hideAddSteps();document.getElementById('add-step1').style.display='block';
+  document.getElementById('manual-status1').textContent='Generating offer…';
+  document.getElementById('manual-status1').className='conn-status waiting';
+  const iceServers=await getICEServers();
+  manualPC=new RTCPeerConnection({iceServers});
+  manualDC=manualPC.createDataChannel('wave',{ordered:true});
+  setupManualDC(manualDC);
+
+  // Gather all ICE candidates
+  const candidates=[];
+  manualPC.onicecandidate=e=>{
+    if(e.candidate)candidates.push(e.candidate);
+    else{
+      // ICE gathering complete — build the offer payload
+      const payload={type:'offer',sdp:manualPC.localDescription.sdp,name:me.name,color:me.color,id:me.peerId};
+      const encoded=btoa(JSON.stringify(payload));
+      document.getElementById('offer-out').value=encoded;
+      document.getElementById('manual-status1').textContent='✓ Offer ready — copy and send to friend';
+      document.getElementById('manual-status1').className='conn-status ok';
+      dlog('ok','Manual offer ready');
+    }
+  };
+  const offer=await manualPC.createOffer();
+  await manualPC.setLocalDescription(offer);
+  dlog('info','Manual offer created, gathering ICE…');
+}
+
+async function processOffer(){
+  const raw=document.getElementById('offer-in').value.trim();
+  if(!raw){toast('Paste the invite code first');return}
+  let payload;
+  try{payload=JSON.parse(atob(raw))}catch(e){toast('Invalid code');return}
+  if(payload.type!=='offer'){toast('This is not an invite code');return}
+
+  hideAddSteps();document.getElementById('add-step2').style.display='block';
+  document.getElementById('offer-in').value=raw;
+  document.getElementById('manual-status2').textContent='Processing offer…';
+  document.getElementById('manual-status2').className='conn-status waiting';
+
+  const iceServers=await getICEServers();
+  manualPC=new RTCPeerConnection({iceServers});
+  manualPeerId=payload.id;
+
+  manualPC.ondatachannel=e=>{manualDC=e.channel;setupManualDC(manualDC)};
+
+  await manualPC.setRemoteDescription({type:'offer',sdp:payload.sdp});
+  const answer=await manualPC.createAnswer();
+  await manualPC.setLocalDescription(answer);
+
+  manualPC.onicecandidate=e=>{
+    if(!e.candidate){
+      const resp={type:'answer',sdp:manualPC.localDescription.sdp,name:me.name,color:me.color,id:me.peerId};
+      const encoded=btoa(JSON.stringify(resp));
+      document.getElementById('answer-out').value=encoded;
+      document.getElementById('answer-section').style.display='block';
+      document.getElementById('manual-status2').textContent='✓ Response ready — copy and send back to friend';
+      document.getElementById('manual-status2').className='conn-status ok';
+      dlog('ok','Manual answer ready');
+      // Save contact
+      addManualContact(payload.name,payload.color,payload.id);
+    }
+  };
+}
+
+async function submitAnswer(){
+  const raw=document.getElementById('answer-in').value.trim();
+  if(!raw){toast('Paste the response code first');return}
+  let payload;
+  try{payload=JSON.parse(atob(raw))}catch(e){toast('Invalid code');return}
+  if(payload.type!=='answer'){toast('This is not a response code');return}
+
+  await manualPC.setRemoteDescription({type:'answer',sdp:payload.sdp});
+  dlog('info','Manual answer applied, connecting…');
+  addManualContact(payload.name,payload.color,payload.id);
+}
+
+function addManualContact(name,color,pid){
+  if(!contacts.find(c=>c.peerId===pid)){
+    contacts.push({name,peerId:pid,color:color||0,addedAt:Date.now(),preview:'',manual:true});
+    saveContacts();renderContacts();
+    dlog('ok','Contact added: '+name);
+    toast(name+' added!');
+  }
+}
+
+function setupManualDC(dc){
+  dc.onopen=()=>{
+    dlog('ok','✓ Manual data channel OPEN');
+    const pid=manualPeerId||dc._peerId;
+    if(pid){
+      conns[pid]={open:true,send:(d)=>dc.send(JSON.stringify(d)),close:()=>dc.close(),_dc:dc};
+      setOnline(pid,true);flushPending(pid);
+    }
+    closeOverlay('add-overlay');
+    toast('Connected!');
+  };
+  dc.onmessage=e=>{
+    try{
+      const d=JSON.parse(e.data);
+      // Figure out who sent this
+      let pid=manualPeerId;
+      if(d.t==='hello'&&d.peerId){pid=d.peerId;manualPeerId=pid;dc._peerId=pid}
+      if(!pid)return;
+      // Update conn reference
+      if(!conns[pid]||!conns[pid].open){
+        conns[pid]={open:true,send:(dd)=>dc.send(JSON.stringify(dd)),close:()=>dc.close(),_dc:dc};
+        setOnline(pid,true);
+      }
+      onData(pid,d);
+    }catch(ex){dlog('err','DC parse: '+ex.message)}
+  };
+  dc.onclose=()=>{
+    dlog('warn','Manual DC closed');
+    if(manualPeerId){delete conns[manualPeerId];setOnline(manualPeerId,false)}
+  };
+}
+
+function showPasteAnswer(){
+  hideAddSteps();
+  document.getElementById('add-step2').style.display='block';
+  document.getElementById('manual-status2').textContent='Paste your friend\'s invite code below';
+  document.getElementById('manual-status2').className='conn-status waiting';
+}
+
+function startPeerJSAdd(){
+  if(peerJSFailed||!peerJSReady){toast('PeerJS server unavailable — use Manual connect');return}
+  hideAddSteps();document.getElementById('add-peerjs').style.display='block';
+  const url=buildShareUrl();
+  if(url){
+    document.getElementById('peerjs-link').textContent=url;
+    document.getElementById('peerjs-status').textContent='✓ Online — share this link';
+    document.getElementById('peerjs-status').className='conn-status ok';
+  }else{
+    document.getElementById('peerjs-link').textContent='Not available in embedded mode';
+    document.getElementById('peerjs-status').textContent='Open in browser first';
+    document.getElementById('peerjs-status').className='conn-status err';
+  }
+}
+
+function copyPeerJSLink(){
+  const url=buildShareUrl();if(url)navigator.clipboard.writeText(url).then(()=>toast('Copied!')).catch(()=>toast('Copy manually'))}
+function copyOffer(){const v=document.getElementById('offer-out').value;if(v)navigator.clipboard.writeText(v).then(()=>toast('Invite code copied!')).catch(()=>toast('Select and copy manually'))}
+function copyAnswer(){const v=document.getElementById('answer-out').value;if(v)navigator.clipboard.writeText(v).then(()=>toast('Response code copied!')).catch(()=>toast('Select and copy manually'))}
+
+function hideAddSteps(){['add-step0','add-step1','add-step2','add-peerjs'].forEach(id=>document.getElementById(id).style.display='none')}
+function openAddModal(){hideAddSteps();document.getElementById('add-step0').style.display='block';if(manualPC){try{manualPC.close()}catch(e){}}manualPC=null;manualDC=null;manualPeerId=null;showOverlay('add-overlay')}
+function cancelAdd(){if(manualPC){try{manualPC.close()}catch(e){}}manualPC=null;manualDC=null;manualPeerId=null;closeOverlay('add-overlay')}
+// ═══ DATA HANDLER (shared by both modes) ═══
 function onData(pid,d){
   if(!d||!d.t)return;
   switch(d.t){
-    case 'ping':try{conns[pid]?.send({t:'pong'})}catch(e){}break;
+    case 'ping':try{sendTo(pid,{t:'pong'})}catch(e){}break;
     case 'pong':setOnline(pid,true);break;
     case 'hello':{
       setOnline(pid,true);
       const c=contacts.find(c=>c.peerId===pid);
-      if(c){c.name=d.name||c.name;c.color=d.color??c.color;saveContacts();renderContacts();if(activeId===pid)document.getElementById('hdr-name').textContent=c.name;dlog('ok',`Hello from ${c.name}`)}
-      else dlog('warn',`Hello from unknown peer ${pid.substring(0,12)}…`);
+      if(c){c.name=d.name||c.name;c.color=d.color??c.color;saveContacts();renderContacts();if(activeId===pid)document.getElementById('hdr-name').textContent=c.name;dlog('ok','Hello from '+c.name)}
       break;
     }
-    case 'msg':dlog('ok',`📨 Message from ${pid.substring(0,12)}…`);receiveMsg(pid,d);try{conns[pid]?.send({t:'receipt',id:d.id,s:'delivered'})}catch(e){}break;
+    case 'msg':dlog('ok','📨 from '+pid.substring(0,12));receiveMsg(pid,d);try{sendTo(pid,{t:'receipt',id:d.id,s:'delivered'})}catch(e){}break;
     case 'receipt':updateReceipt(pid,d.id,d.s);break;
     case 'typing':showTyping(pid,d.on);break;
     case 'fmeta':receiveFileMeta(pid,d);break;
     case 'fchunk':receiveChunk(pid,d);break;
     case 'fdone':finalizeFile(pid,d.tid);break;
   }
+}
+function sendTo(pid,data){
+  const c=conns[pid];
+  if(!c||!c.open)throw new Error('not connected');
+  if(c._dc){c._dc.send(JSON.stringify(data))} // manual mode
+  else if(c.send){c.send(data)} // peerjs mode
 }
 
 // ═══ MESSAGING ═══
@@ -448,19 +566,16 @@ function sendMessage(){
   if(!text||!activeId)return;
   const msg={id:uid(),t:'msg',from:me.peerId,text,ts:Date.now(),receipt:'sent'};
   pushMsg(activeId,msg);appendBubble(activeId,msg);scrollDown();
-  const conn=conns[activeId];
-  if(conn?.open){try{conn.send(msg);dlog('ok',`📤 Sent to ${activeId.substring(0,12)}…`)}catch(e){dlog('err','Send failed: '+e.message);queuePending(activeId,msg)}}
-  else{dlog('warn','Offline — queued');queuePending(activeId,msg)}
+  try{sendTo(activeId,msg);dlog('ok','📤 Sent')}catch(e){dlog('warn','Offline, queued');queuePending(activeId,msg)}
   inp.value='';inp.style.height='';sendTyping(false);updatePreview(activeId,text);
 }
 function queuePending(pid,msg){if(!pendingMsgs[pid])pendingMsgs[pid]=[];pendingMsgs[pid].push(msg);savePending()}
 function flushPending(pid){
-  const q=pendingMsgs[pid];if(!q||!q.length)return;const conn=conns[pid];if(!conn?.open)return;
-  dlog('info',`Flushing ${q.length} pending to ${pid.substring(0,12)}…`);
-  const sent=[];for(const m of q){try{conn.send(m);sent.push(m.id)}catch(e){break}}
+  const q=pendingMsgs[pid];if(!q||!q.length)return;
+  dlog('info','Flushing '+q.length+' pending');
+  const sent=[];for(const m of q){try{sendTo(pid,m);sent.push(m.id)}catch(e){break}}
   pendingMsgs[pid]=(pendingMsgs[pid]||[]).filter(m=>!sent.includes(m.id));
   if(!pendingMsgs[pid].length)delete pendingMsgs[pid];savePending();
-  dlog('ok',`Flushed ${sent.length} messages`);
 }
 function savePending(){localStorage.setItem('wave_pending',JSON.stringify(pendingMsgs))}
 function receiveMsg(pid,d){
@@ -468,45 +583,35 @@ function receiveMsg(pid,d){
   const msg={...d,receipt:'received'};pushMsg(pid,msg);
   if(activeId===pid){appendBubble(pid,msg);scrollDown()}
   else{unread[pid]=(unread[pid]||0)+1;saveUnread();renderContacts()}
-  updatePreview(pid,d.text||(d.subtype==='file'?`📎 ${d.fname}`:''));
+  updatePreview(pid,d.text||(d.subtype==='file'?'📎 '+d.fname:''));
 }
 function pushMsg(pid,msg){if(!messages[pid])messages[pid]=[];messages[pid].push(msg);if(messages[pid].length>500)messages[pid]=messages[pid].slice(-400);saveMsgs()}
 function updateReceipt(pid,id,s){const m=(messages[pid]||[]).find(m=>m.id===id);if(m){m.receipt=s;saveMsgs()}const el=document.querySelector(`.receipt[data-id="${id}"]`);if(el)el.textContent=s==='read'?'✓✓':'✓'}
 function onTypingInput(){const inp=document.getElementById('msg-input');inp.style.height='auto';inp.style.height=Math.min(inp.scrollHeight,110)+'px';sendTyping(true);clearTimeout(typingDebounce);typingDebounce=setTimeout(()=>sendTyping(false),2200)}
-function sendTyping(on){try{conns[activeId]?.open&&conns[activeId].send({t:'typing',on})}catch(e){}}
-function showTyping(pid,on){
-  if(activeId!==pid)return;const exist=document.getElementById('typing-bub');
-  if(on&&!exist){const el=document.createElement('div');el.id='typing-bub';el.innerHTML='<div class="typing-wrap"><div class="td"></div><div class="td"></div><div class="td"></div></div>';document.getElementById('messages').appendChild(el);scrollDown();clearTimeout(typingTimers[pid]);typingTimers[pid]=setTimeout(()=>el.remove(),6000)}
-  else if(!on&&exist){exist.remove();clearTimeout(typingTimers[pid])}
-}
+function sendTyping(on){try{sendTo(activeId,{t:'typing',on})}catch(e){}}
+function showTyping(pid,on){if(activeId!==pid)return;const exist=document.getElementById('typing-bub');if(on&&!exist){const el=document.createElement('div');el.id='typing-bub';el.innerHTML='<div class="typing-wrap"><div class="td"></div><div class="td"></div><div class="td"></div></div>';document.getElementById('messages').appendChild(el);scrollDown();clearTimeout(typingTimers[pid]);typingTimers[pid]=setTimeout(()=>el.remove(),6000)}else if(!on&&exist){exist.remove();clearTimeout(typingTimers[pid])}}
 function onMsgKey(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMessage()}}
 
 // ═══ FILES ═══
 async function sendFile(file){
-  if(!file||!activeId)return;const conn=conns[activeId];if(!conn?.open){toast('Contact offline');return}
+  if(!file||!activeId)return;try{sendTo(activeId,{t:'test'})}catch(e){toast('Contact offline');return}
   const tid=uid(),isImg=file.type.startsWith('image/');
-  try{conn.send({t:'fmeta',tid,name:file.name,size:file.size,mime:file.type,isImg})}catch(e){toast('Send failed');return}
+  try{sendTo(activeId,{t:'fmeta',tid,name:file.name,size:file.size,mime:file.type,isImg})}catch(e){toast('Failed');return}
   const msg={id:tid,t:'msg',subtype:'file',from:me.peerId,fname:file.name,fsize:file.size,fmime:file.type,isImg,ts:Date.now(),tid,progress:0};
   pushMsg(activeId,msg);appendBubble(activeId,msg);scrollDown();
   const buf=await file.arrayBuffer();const total=Math.ceil(buf.byteLength/CHUNK);
-  for(let i=0;i<total;i++){try{conn.send({t:'fchunk',tid,i,data:buf.slice(i*CHUNK,(i+1)*CHUNK)})}catch(e){toast('Transfer interrupted');break}setProgress(tid,Math.round(((i+1)/total)*100));await pause(8)}
-  try{conn.send({t:'fdone',tid})}catch(e){}document.getElementById('file-input').value='';dlog('ok','File sent: '+file.name);
+  for(let i=0;i<total;i++){try{sendTo(activeId,{t:'fchunk',tid,i,data:Array.from(new Uint8Array(buf.slice(i*CHUNK,(i+1)*CHUNK)))})}catch(e){toast('Interrupted');break}setProgress(tid,Math.round(((i+1)/total)*100));await pause(8)}
+  try{sendTo(activeId,{t:'fdone',tid})}catch(e){}document.getElementById('file-input').value='';
 }
 function receiveFileMeta(pid,d){fileXfers[d.tid]={chunks:[],meta:d,pid};const msg={id:d.tid,t:'msg',subtype:'file',from:pid,fname:d.name,fsize:d.size,fmime:d.mime,isImg:d.isImg,ts:Date.now(),tid:d.tid,progress:0};pushMsg(pid,msg);if(activeId===pid){appendBubble(pid,msg);scrollDown()}}
-function receiveChunk(pid,d){const x=fileXfers[d.tid];if(!x)return;x.chunks[d.i]=d.data;const total=Math.ceil(x.meta.size/CHUNK);setProgress(d.tid,Math.round((x.chunks.filter(Boolean).length/total)*100))}
-function finalizeFile(pid,tid){
-  const x=fileXfers[tid];if(!x)return;const blob=new Blob(x.chunks,{type:x.meta.mime});const url=URL.createObjectURL(blob);
-  const dl=document.querySelector(`.file-dl[data-tid="${tid}"]`);if(dl){dl.href=url;dl.download=x.meta.name;dl.textContent='Download'}
-  const prog=document.querySelector(`.prog-bar[data-tid="${tid}"]`);if(prog)prog.parentElement.style.display='none';
-  if(x.meta.isImg){const img=document.querySelector(`img[data-tid="${tid}"]`);if(img)img.src=url}
-  const m=(messages[pid]||[]).find(m=>m.id===tid);if(m){m.dlUrl=url;saveMsgs()}delete fileXfers[tid];dlog('ok','File received: '+x.meta.name);
-}
+function receiveChunk(pid,d){const x=fileXfers[d.tid];if(!x)return;x.chunks[d.i]=d.data instanceof Array?new Uint8Array(d.data):d.data;const total=Math.ceil(x.meta.size/CHUNK);setProgress(d.tid,Math.round((x.chunks.filter(Boolean).length/total)*100))}
+function finalizeFile(pid,tid){const x=fileXfers[tid];if(!x)return;const blob=new Blob(x.chunks,{type:x.meta.mime});const url=URL.createObjectURL(blob);const dl=document.querySelector(`.file-dl[data-tid="${tid}"]`);if(dl){dl.href=url;dl.download=x.meta.name;dl.textContent='Download'}const prog=document.querySelector(`.prog-bar[data-tid="${tid}"]`);if(prog)prog.parentElement.style.display='none';if(x.meta.isImg){const img=document.querySelector(`img[data-tid="${tid}"]`);if(img)img.src=url}const m=(messages[pid]||[]).find(m=>m.id===tid);if(m){m.dlUrl=url;saveMsgs()}delete fileXfers[tid]}
 function setProgress(tid,pct){const b=document.querySelector(`.prog-bar[data-tid="${tid}"]`);if(b)b.style.width=pct+'%'}
 
 // ═══ CALLING ═══
-async function startCall(wv){if(!activeId)return;if(!conns[activeId]?.open){toast('Offline');return}try{localStream=await navigator.mediaDevices.getUserMedia({video:wv,audio:true});document.getElementById('local-vid').srcObject=localStream;currentCall=peer.call(activeId,localStream,{metadata:{type:wv?'video':'audio',caller:me.name}});showCallScreen(contacts.find(c=>c.peerId===activeId),'Calling…');currentCall.on('stream',s=>{document.getElementById('remote-vid').srcObject=s;setCallStat('Connected')});currentCall.on('close',endCall);currentCall.on('error',endCall)}catch(e){toast('Permission denied')}}
-function onIncomingCall(call){const c=contacts.find(c=>c.peerId===call.peer)||{name:call.metadata?.caller||'Unknown',peerId:call.peer,color:0};pendingCall=call;document.getElementById('inc-avatar').textContent=c.name[0].toUpperCase();document.getElementById('inc-avatar').style.background=PALETTE[c.color||0];document.getElementById('inc-avatar').style.color=PAL_BG[c.color||0];document.getElementById('inc-name').textContent=c.name;document.getElementById('inc-type').textContent=call.metadata?.type==='video'?'Incoming video call':'Incoming voice call';document.getElementById('incoming-screen').classList.add('show')}
-async function acceptCall(){document.getElementById('incoming-screen').classList.remove('show');if(!pendingCall)return;const c=contacts.find(c=>c.peerId===pendingCall.peer)||{name:'Unknown',color:0};try{localStream=await navigator.mediaDevices.getUserMedia({video:pendingCall.metadata?.type==='video',audio:true});document.getElementById('local-vid').srcObject=localStream;pendingCall.answer(localStream);currentCall=pendingCall;showCallScreen(c,'Connected');currentCall.on('stream',s=>{document.getElementById('remote-vid').srcObject=s});currentCall.on('close',endCall)}catch(e){toast('Permission denied');pendingCall.close()}pendingCall=null}
+async function startCall(wv){if(!activeId)return;try{sendTo(activeId,{t:'test'})}catch(e){toast('Offline');return}try{localStream=await navigator.mediaDevices.getUserMedia({video:wv,audio:true});document.getElementById('local-vid').srcObject=localStream;currentCall=peer.call(activeId,localStream,{metadata:{type:wv?'video':'audio',caller:me.name}});showCallScreen(contacts.find(c=>c.peerId===activeId),'Calling…');currentCall.on('stream',s=>{document.getElementById('remote-vid').srcObject=s;setCallStat('Connected')});currentCall.on('close',endCall);currentCall.on('error',endCall)}catch(e){toast('Permission denied')}}
+function onIncomingCall(call){const c=contacts.find(c=>c.peerId===call.peer)||{name:call.metadata?.caller||'Unknown',color:0};pendingCall=call;document.getElementById('inc-avatar').textContent=c.name[0].toUpperCase();document.getElementById('inc-avatar').style.background=PALETTE[c.color||0];document.getElementById('inc-avatar').style.color=PAL_BG[c.color||0];document.getElementById('inc-name').textContent=c.name;document.getElementById('inc-type').textContent=call.metadata?.type==='video'?'Incoming video call':'Incoming voice call';document.getElementById('incoming-screen').classList.add('show')}
+async function acceptCall(){document.getElementById('incoming-screen').classList.remove('show');if(!pendingCall)return;try{localStream=await navigator.mediaDevices.getUserMedia({video:pendingCall.metadata?.type==='video',audio:true});document.getElementById('local-vid').srcObject=localStream;pendingCall.answer(localStream);currentCall=pendingCall;showCallScreen(contacts.find(c=>c.peerId===pendingCall.peer)||{name:'Unknown',color:0},'Connected');currentCall.on('stream',s=>{document.getElementById('remote-vid').srcObject=s});currentCall.on('close',endCall)}catch(e){toast('Permission denied');pendingCall.close()}pendingCall=null}
 function rejectCall(){pendingCall?.close();pendingCall=null;document.getElementById('incoming-screen').classList.remove('show')}
 function showCallScreen(c,s){document.getElementById('call-name').textContent=c?.name||'';document.getElementById('call-status').textContent=s;document.getElementById('call-screen').classList.add('show')}
 function setCallStat(s){document.getElementById('call-status').textContent=s}
@@ -519,116 +624,45 @@ async function doScreenShare(){try{const ss=await navigator.mediaDevices.getDisp
 function renderContacts(filter=''){
   const el=document.getElementById('contacts-list');const fl=filter.toLowerCase();
   const list=contacts.filter(c=>!fl||c.name.toLowerCase().includes(fl));
-  if(!contacts.length){el.innerHTML='<div class="empty-state"><div style="font-size:32px">👋</div><p>No contacts yet.<br>Tap ＋ to share your link.</p></div>';return}
+  if(!contacts.length){el.innerHTML='<div class="empty-state"><div style="font-size:32px">👋</div><p>No contacts yet.<br>Tap ＋ to add a friend.</p></div>';return}
   const sorted=[...list].sort((a,b)=>{const ta=(messages[a.peerId]||[]).slice(-1)[0]?.ts||0;const tb=(messages[b.peerId]||[]).slice(-1)[0]?.ts||0;return tb-ta});
   el.innerHTML=sorted.map(c=>{
-    const on=!!conns[c.peerId]?.open;const lm=(messages[c.peerId]||[]).slice(-1)[0];
-    const pv=c.preview||(lm?(lm.subtype==='file'?`📎 ${lm.fname}`:lm.text):'');
+    const on=!!(conns[c.peerId]&&conns[c.peerId].open);const lm=(messages[c.peerId]||[]).slice(-1)[0];
+    const pv=c.preview||(lm?(lm.subtype==='file'?'📎 '+lm.fname:lm.text):'');
     const ub=unread[c.peerId]||0;const ts=lm?fmtTime(lm.ts):'';
-    return `<div class="contact-row${activeId===c.peerId?' active':''}" onclick="openChat('${c.peerId}')">
-      <div class="c-avatar" style="background:${PALETTE[c.color||0]};color:${PAL_BG[c.color||0]}">${c.name[0].toUpperCase()}<div class="online-pip${on?' on':''}"></div></div>
-      <div class="c-info"><div class="c-name">${esc(c.name)}</div>${pv?`<div class="c-preview">${esc(pv)}</div>`:''}</div>
-      <div class="c-meta">${ts?`<div class="c-time">${ts}</div>`:''}${ub?`<div class="c-badge">${ub}</div>`:''}</div>
-      <button class="c-del" onclick="event.stopPropagation();askDelete('${c.peerId}')" title="Delete">✕</button>
-    </div>`}).join('');
+    return `<div class="contact-row${activeId===c.peerId?' active':''}" onclick="openChat('${c.peerId}')"><div class="c-avatar" style="background:${PALETTE[c.color||0]};color:${PAL_BG[c.color||0]}">${c.name[0].toUpperCase()}<div class="online-pip${on?' on':''}"></div></div><div class="c-info"><div class="c-name">${esc(c.name)}</div>${pv?`<div class="c-preview">${esc(pv)}</div>`:''}</div><div class="c-meta">${ts?`<div class="c-time">${ts}</div>`:''}${ub?`<div class="c-badge">${ub}</div>`:''}</div><button class="c-del" onclick="event.stopPropagation();askDelete('${c.peerId}')" title="Delete">✕</button></div>`}).join('');
 }
 function filterContacts(v){renderContacts(v)}
 function setOnline(pid,on){const c=contacts.find(c=>c.peerId===pid);if(c)c.online=on;renderContacts();if(activeId===pid){document.getElementById('hdr-status').textContent=on?'● online':'○ offline';document.getElementById('hdr-status').style.color=on?'var(--accent)':'var(--text3)';document.getElementById('offline-bar').style.display=on?'none':'block'}}
 function updatePreview(pid,text){const c=contacts.find(c=>c.peerId===pid);if(c){c.preview=text;saveContacts();renderContacts()}}
 
-// ═══ DELETE CONTACT ═══
+// ═══ DELETE ═══
 function askDelete(pid){const c=contacts.find(c=>c.peerId===pid);if(!c)return;deletePeerId=pid;document.getElementById('del-name').textContent=c.name;showOverlay('delete-overlay')}
-function confirmDelete(){
-  if(!deletePeerId)return;
-  dlog('info','Deleting: '+deletePeerId);
-  if(conns[deletePeerId]){try{conns[deletePeerId].close()}catch(e){}delete conns[deletePeerId]}
-  contacts=contacts.filter(c=>c.peerId!==deletePeerId);saveContacts();
-  delete messages[deletePeerId];saveMsgs();
-  delete unread[deletePeerId];saveUnread();
-  delete pendingMsgs[deletePeerId];savePending();
-  if(activeId===deletePeerId)closeChat();
-  renderContacts();closeOverlay('delete-overlay');deletePeerId=null;toast('Contact deleted');
-}
+function confirmDelete(){if(!deletePeerId)return;if(conns[deletePeerId]){try{if(conns[deletePeerId].close)conns[deletePeerId].close()}catch(e){}delete conns[deletePeerId]}contacts=contacts.filter(c=>c.peerId!==deletePeerId);saveContacts();delete messages[deletePeerId];saveMsgs();delete unread[deletePeerId];saveUnread();delete pendingMsgs[deletePeerId];savePending();if(activeId===deletePeerId)closeChat();renderContacts();closeOverlay('delete-overlay');deletePeerId=null;toast('Deleted')}
 
 // ═══ CHAT UI ═══
-function openChat(pid){
-  activeId=pid;const c=contacts.find(c=>c.peerId===pid);if(!c)return;
-  unread[pid]=0;saveUnread();renderContacts();
-  document.getElementById('welcome').style.display='none';document.getElementById('chat-view').style.display='flex';
-  document.getElementById('hdr-name').textContent=c.name;
-  const av=document.getElementById('hdr-avatar');av.textContent=c.name[0].toUpperCase();
-  av.style.cssText=`width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;background:${PALETTE[c.color||0]};color:${PAL_BG[c.color||0]}`;
-  const on=!!conns[pid]?.open;
-  document.getElementById('hdr-status').textContent=on?'● online':'○ offline';
-  document.getElementById('hdr-status').style.color=on?'var(--accent)':'var(--text3)';
-  document.getElementById('offline-bar').style.display=on?'none':'block';
-  renderMsgs(pid);scrollDown();dial(c);
-  if(window.innerWidth<=620){document.getElementById('sidebar').classList.add('slide-out');document.getElementById('back-btn').style.display='flex'}
-  document.getElementById('msg-input').focus();
-}
+function openChat(pid){activeId=pid;const c=contacts.find(c=>c.peerId===pid);if(!c)return;unread[pid]=0;saveUnread();renderContacts();document.getElementById('welcome').style.display='none';document.getElementById('chat-view').style.display='flex';document.getElementById('hdr-name').textContent=c.name;const av=document.getElementById('hdr-avatar');av.textContent=c.name[0].toUpperCase();av.style.cssText=`width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;background:${PALETTE[c.color||0]};color:${PAL_BG[c.color||0]}`;const on=!!(conns[pid]&&conns[pid].open);document.getElementById('hdr-status').textContent=on?'● online':'○ offline';document.getElementById('hdr-status').style.color=on?'var(--accent)':'var(--text3)';document.getElementById('offline-bar').style.display=on?'none':'block';renderMsgs(pid);scrollDown();if(peerJSReady)dialPeerJS(c);if(window.innerWidth<=620){document.getElementById('sidebar').classList.add('slide-out');document.getElementById('back-btn').style.display='flex'}document.getElementById('msg-input').focus()}
 function closeChat(){activeId=null;document.getElementById('chat-view').style.display='none';document.getElementById('welcome').style.display='flex';document.getElementById('sidebar').classList.remove('slide-out');renderContacts()}
-function renderMsgs(pid){
-  const el=document.getElementById('messages');el.innerHTML='';const list=messages[pid]||[];let lastDate=null;
-  list.forEach(m=>{const dk=new Date(m.ts).toDateString();if(dk!==lastDate){const d=document.createElement('div');d.className='date-sep';d.textContent=fmtDate(m.ts);el.appendChild(d);lastDate=dk}appendBubble(pid,m,true)});
-}
-function appendBubble(pid,msg,skip=false){
-  const el=document.getElementById('messages');if(el.querySelector(`.msg-group[data-id="${msg.id}"]`))return;
-  const isMe=msg.from===me.peerId;const g=document.createElement('div');g.className=`msg-group ${isMe?'me':'them'}`;g.dataset.id=msg.id;
-  if(msg.subtype==='file')g.innerHTML=buildFileBubble(msg,isMe);
-  else{const r=isMe?`<span class="receipt" data-id="${msg.id}">${msg.receipt==='delivered'?'✓':msg.receipt==='read'?'✓✓':'·'}</span>`:'';g.innerHTML=`<div class="bubble">${esc(msg.text).replace(/\n/g,'<br/>')}</div><div class="msg-footer"><span class="msg-time">${fmtTime(msg.ts)}</span>${r}</div>`}
-  el.appendChild(g);const tb=document.getElementById('typing-bub');if(tb&&!skip)el.appendChild(tb);
-}
-function buildFileBubble(msg,isMe){
-  const sz=fmtSz(msg.fsize);
-  if(msg.isImg){const src=msg.dlUrl||'';return `<div class="bubble" style="padding:6px 6px 4px"><img src="${src}" data-tid="${msg.tid||msg.id}" onclick="window.open(this.src,'_blank')" style="max-width:200px;max-height:170px;border-radius:8px;display:block${src?'':';opacity:.4'}"/><div style="font-size:10px;color:var(--text3);padding:3px 3px 0">${esc(msg.fname)} · ${sz}</div></div><div class="msg-footer"><span class="msg-time">${fmtTime(msg.ts)}</span></div>`}
-  const dl=msg.dlUrl?`<a class="file-dl" data-tid="${msg.tid||msg.id}" href="${msg.dlUrl}" download="${esc(msg.fname)}">Download</a>`:`<a class="file-dl" data-tid="${msg.tid||msg.id}" href="#">Receiving…</a>`;
-  const pr=msg.dlUrl?'':`<div class="prog-wrap"><div class="prog-bar" data-tid="${msg.tid||msg.id}"></div></div>`;
-  return `<div class="bubble file-bubble"><div class="file-ico">${fmtIcon(msg.fmime)}</div><div class="file-meta"><div class="file-name">${esc(msg.fname)}</div><div class="file-sz">${sz}</div>${dl}${pr}</div></div><div class="msg-footer"><span class="msg-time">${fmtTime(msg.ts)}</span></div>`
-}
+function renderMsgs(pid){const el=document.getElementById('messages');el.innerHTML='';const list=messages[pid]||[];let lastDate=null;list.forEach(m=>{const dk=new Date(m.ts).toDateString();if(dk!==lastDate){const d=document.createElement('div');d.className='date-sep';d.textContent=fmtDate(m.ts);el.appendChild(d);lastDate=dk}appendBubble(pid,m,true)})}
+function appendBubble(pid,msg,skip=false){const el=document.getElementById('messages');if(el.querySelector(`.msg-group[data-id="${msg.id}"]`))return;const isMe=msg.from===me.peerId;const g=document.createElement('div');g.className=`msg-group ${isMe?'me':'them'}`;g.dataset.id=msg.id;if(msg.subtype==='file')g.innerHTML=buildFileBubble(msg,isMe);else{const r=isMe?`<span class="receipt" data-id="${msg.id}">${msg.receipt==='delivered'?'✓':msg.receipt==='read'?'✓✓':'·'}</span>`:'';g.innerHTML=`<div class="bubble">${esc(msg.text).replace(/\n/g,'<br/>')}</div><div class="msg-footer"><span class="msg-time">${fmtTime(msg.ts)}</span>${r}</div>`}el.appendChild(g);const tb=document.getElementById('typing-bub');if(tb&&!skip)el.appendChild(tb)}
+function buildFileBubble(msg){const sz=fmtSz(msg.fsize);if(msg.isImg){const src=msg.dlUrl||'';return `<div class="bubble" style="padding:6px 6px 4px"><img src="${src}" data-tid="${msg.tid||msg.id}" onclick="window.open(this.src,'_blank')" style="max-width:200px;max-height:170px;border-radius:8px;display:block${src?'':';opacity:.4'}"/><div style="font-size:10px;color:var(--text3);padding:3px 3px 0">${esc(msg.fname)} · ${sz}</div></div><div class="msg-footer"><span class="msg-time">${fmtTime(msg.ts)}</span></div>`}const dl=msg.dlUrl?`<a class="file-dl" data-tid="${msg.tid||msg.id}" href="${msg.dlUrl}" download="${esc(msg.fname)}">Download</a>`:`<a class="file-dl" data-tid="${msg.tid||msg.id}" href="#">Receiving…</a>`;const pr=msg.dlUrl?'':`<div class="prog-wrap"><div class="prog-bar" data-tid="${msg.tid||msg.id}"></div></div>`;return `<div class="bubble file-bubble"><div class="file-ico">${fmtIcon(msg.fmime)}</div><div class="file-meta"><div class="file-name">${esc(msg.fname)}</div><div class="file-sz">${sz}</div>${dl}${pr}</div></div><div class="msg-footer"><span class="msg-time">${fmtTime(msg.ts)}</span></div>`}
 function scrollDown(){const el=document.getElementById('messages');requestAnimationFrame(()=>{el.scrollTop=el.scrollHeight})}
 
-// ═══ ADD CONTACT ═══
-function checkAddLink(){
-  const h=location.hash;dlog('info','Hash: "'+h+'"');
-  if(!h.startsWith('#add/'))return;
-  const parts=h.slice(5).split('/');if(parts.length<2){dlog('warn','Invalid add link');return}
-  const name=decodeURIComponent(parts[0]);const pid=parts.slice(1).join('/');
-  dlog('info',`Add link: name="${name}" pid="${pid}"`);
-  if(!pid||pid===me.peerId){dlog('warn','Self link');location.hash='';return}
-  if(contacts.find(c=>c.peerId===pid)){toast(name+' already added');location.hash='';return}
-  const b=document.getElementById('add-banner');document.getElementById('banner-name').textContent=name;
-  b.dataset.name=name;b.dataset.pid=pid;b.style.display='block';
-}
-function confirmAdd(){
-  const b=document.getElementById('add-banner');
-  const c={name:b.dataset.name,peerId:b.dataset.pid,color:Math.floor(Math.random()*PALETTE.length),addedAt:Date.now(),preview:''};
-  dlog('ok',`Adding: ${c.name} (${c.peerId})`);
-  contacts.push(c);saveContacts();renderContacts();
-  setTimeout(()=>dial(c),500);
-  b.style.display='none';location.hash='';toast(c.name+' added!');
-}
+// ═══ ADD VIA URL (PeerJS mode) ═══
+function checkAddLink(){const h=location.hash;if(!h.startsWith('#add/'))return;const parts=h.slice(5).split('/');if(parts.length<2)return;const name=decodeURIComponent(parts[0]);const pid=parts.slice(1).join('/');if(!pid||pid===me.peerId){location.hash='';return}if(contacts.find(c=>c.peerId===pid)){toast(name+' already added');location.hash='';return}const b=document.getElementById('add-banner');document.getElementById('banner-name').textContent=name;b.dataset.name=name;b.dataset.pid=pid;b.style.display='block'}
+function confirmBannerAdd(){const b=document.getElementById('add-banner');const c={name:b.dataset.name,peerId:b.dataset.pid,color:Math.floor(Math.random()*PALETTE.length),addedAt:Date.now(),preview:''};contacts.push(c);saveContacts();renderContacts();if(peerJSReady)setTimeout(()=>dialPeerJS(c),500);b.style.display='none';location.hash='';toast(c.name+' added!')}
 function dismissBanner(){document.getElementById('add-banner').style.display='none';location.hash=''}
 
 // ═══ SETUP & PROFILE ═══
-function completeSetup(){const name=document.getElementById('setup-name').value.trim();if(!name){toast('Enter your name');return}me={name,peerId:genId(),color:setupColorIdx};localStorage.setItem('wave_me',JSON.stringify(me));dlog('ok',`Created: "${me.name}" id=${me.peerId}`);closeOverlay('setup-overlay');startApp()}
+function completeSetup(){const name=document.getElementById('setup-name').value.trim();if(!name){toast('Enter your name');return}me={name,peerId:genId(),color:setupColorIdx};localStorage.setItem('wave_me',JSON.stringify(me));closeOverlay('setup-overlay');startApp()}
 function renderSidebarMe(){document.getElementById('my-name').textContent=me.name;const av=document.getElementById('my-avatar');av.textContent=me.name[0].toUpperCase();av.style.background=PALETTE[me.color];av.style.color=PAL_BG[me.color]}
 function openProfileModal(){document.getElementById('profile-name').value=me.name;document.querySelectorAll('#profile-color-grid .color-swatch').forEach((el,i)=>{el.classList.toggle('active',i===me.color)});profileColorIdx=me.color;showOverlay('profile-overlay')}
-function saveProfile(){const name=document.getElementById('profile-name').value.trim();if(!name)return;me.name=name;me.color=profileColorIdx;localStorage.setItem('wave_me',JSON.stringify(me));renderSidebarMe();closeOverlay('profile-overlay');Object.values(conns).forEach(c=>{try{if(c.open)c.send({t:'hello',name:me.name,color:me.color})}catch(e){}});toast('Saved')}
+function saveProfile(){const name=document.getElementById('profile-name').value.trim();if(!name)return;me.name=name;me.color=profileColorIdx;localStorage.setItem('wave_me',JSON.stringify(me));renderSidebarMe();closeOverlay('profile-overlay');Object.values(conns).forEach(c=>{try{if(c.open)sendTo(c,{t:'hello',name:me.name,color:me.color})}catch(e){}});toast('Saved')}
 function setStatus(s){document.getElementById('peer-status').textContent=s}
 
-// ═══ SHARE ═══
+// ═══ SHARE URL (PeerJS) ═══
 function getRealOrigin(){try{const l=window.location.href;if(l.startsWith('about:')||l.startsWith('blob:')||l.includes('srcdoc'))return null;return l.split('#')[0]}catch(e){return null}}
 function buildShareUrl(){const b=getRealOrigin();if(!b)return null;return b+'#add/'+encodeURIComponent(me.name)+'/'+me.peerId}
-function getShareFragment(){return '#add/'+encodeURIComponent(me.name)+'/'+me.peerId}
-function openShareModal(){
-  const url=buildShareUrl();const emb=!url;
-  if(emb){document.getElementById('share-url-text').textContent=getShareFragment();document.getElementById('share-embedded-notice').style.display='block';document.getElementById('share-copy-btn').style.display='none';document.getElementById('tab-qr').style.display='none';document.querySelector('.tab-row').style.display='none'}
-  else{document.getElementById('share-url-text').textContent=url;document.getElementById('share-embedded-notice').style.display='none';document.getElementById('share-copy-btn').style.display='flex';document.querySelector('.tab-row').style.display='flex';qrDraw(url)}
-  dlog('info','Share URL: '+(url||getShareFragment()));showOverlay('share-overlay');
-}
-function copyLink(){navigator.clipboard.writeText(buildShareUrl()||getShareFragment()).then(()=>toast('Copied!')).catch(()=>toast('Copy manually'))}
-let _tab='link';
-function switchTab(m,btn){_tab=m;document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));btn.classList.add('active');document.getElementById('tab-link').style.display=m==='link'?'block':'none';document.getElementById('tab-qr').style.display=m==='qr'?'block':'none'}
 
 // ═══ MODALS ═══
 function showOverlay(id){document.getElementById(id).classList.add('show')}
@@ -644,12 +678,11 @@ function pause(ms){return new Promise(r=>setTimeout(r,ms))}
 function fmtTime(ts){return new Date(ts).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}
 function fmtDate(ts){const d=new Date(ts),t=new Date();if(d.toDateString()===t.toDateString())return'Today';const y=new Date(t);y.setDate(t.getDate()-1);if(d.toDateString()===y.toDateString())return'Yesterday';return d.toLocaleDateString([],{day:'numeric',month:'short'})}
 function fmtSz(b){if(!b)return'';if(b<1024)return b+' B';if(b<1048576)return(b/1024).toFixed(1)+' KB';return(b/1048576).toFixed(1)+' MB'}
-function fmtIcon(m=''){if(m.startsWith('image/'))return'🖼️';if(m.startsWith('video/'))return'🎬';if(m.startsWith('audio/'))return'🎵';if(m.includes('pdf'))return'📄';if(m.includes('zip')||m.includes('rar'))return'📦';return'📁'}
-function qrDraw(url){const c=document.getElementById('qr-container');c.innerHTML='';if(window.QRCode)new QRCode(c,{text:url,width:200,height:200,colorDark:'#000',colorLight:'#fff',correctLevel:QRCode.CorrectLevel.M});else c.textContent='QR unavailable'}
+function fmtIcon(m=''){if(m.startsWith('image/'))return'🖼️';if(m.startsWith('video/'))return'🎬';if(m.startsWith('audio/'))return'🎵';if(m.includes('pdf'))return'📄';return'📁'}
 function saveContacts(){localStorage.setItem('wave_contacts',JSON.stringify(contacts))}
 function saveMsgs(){localStorage.setItem('wave_messages',JSON.stringify(messages))}
 function saveUnread(){localStorage.setItem('wave_unread',JSON.stringify(unread))}
-document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'&&me){dlog('info','Tab visible');if(!peer||peer.destroyed)initPeer();else if(peer.disconnected)try{peer.reconnect()}catch(e){initPeer()}else contacts.forEach(c=>{if(!conns[c.peerId]?.open)dial(c)})}});
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'&&me){if(!peerJSReady&&!peerJSFailed)initPeerJS();else if(peerJSReady)contacts.forEach(c=>{if(!(conns[c.peerId]&&conns[c.peerId].open))dialPeerJS(c)})}});
 window.addEventListener('hashchange',()=>{if(me)checkAddLink()});
 </script>
 </body>
