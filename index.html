@@ -202,42 +202,83 @@ function buildGrid(id,ai){document.getElementById(id).innerHTML=PALETTE.map((c,i
 function pickColor(el,gid,idx){document.querySelectorAll('#'+gid+' .color-swatch').forEach(e=>e.classList.remove('active'));el.classList.add('active');if(gid==='setup-color-grid')setupColorIdx=idx;else profileColorIdx=idx}
 
 // ═══ PEERJS ═══
+let _lastInitTime=0;
+let _initCount=0;
+let _peerJSGaveUp=false;
+
 function initPeer(){
-  dlog('info','═══ initPeer ═══');setStatus('connecting…');
+  // Rate limit: don't reinit more than once per 5 seconds
+  const now=Date.now();
+  if(now-_lastInitTime<5000){dlog('warn','initPeer throttled');return}
+  _lastInitTime=now;
+  _initCount++;
+
+  // Give up after 5 failed attempts — PeerJS server is broken, use manual mode
+  if(_initCount>5){
+    if(!_peerJSGaveUp){dlog('err','PeerJS gave up after 5 attempts — use Manual Code to connect');_peerJSGaveUp=true}
+    setStatus('manual mode');return;
+  }
+
+  dlog('info','═══ initPeer (#'+_initCount+') ═══');setStatus('connecting…');
   if(keepAliveId){clearInterval(keepAliveId);keepAliveId=null}
-  if(peer&&!peer.destroyed)try{peer.destroy()}catch(e){}
+
+  // IMPORTANT: Only close PeerJS connections, NOT manual WebRTC connections
+  if(peer&&!peer.destroyed){
+    try{peer.destroy()}catch(e){}
+    // Clean only PeerJS conns (those without _dc property)
+    Object.keys(conns).forEach(p=>{
+      if(!conns[p]._dc){try{conns[p].close()}catch(e){}delete conns[p]}
+    });
+  }
   peer=null;peerReady=false;
-  Object.keys(conns).forEach(p=>{try{conns[p].close()}catch(e){}});conns={};
 
   let id=me.peerId;
   if(!id||!/^[a-zA-Z0-9_-]+$/.test(id)){id=genId();me.peerId=id;localStorage.setItem('wave_me',JSON.stringify(me))}
   dlog('info','ID: '+id);
 
   try{peer=new Peer(id,{debug:0,config:{iceServers:ICE_SERVERS}})}
-  catch(e){dlog('err','Peer fail: '+e.message);setTimeout(initPeer,4000);return}
+  catch(e){dlog('err','Peer fail: '+e.message);setTimeout(initPeer,6000);return}
 
-  const tout=setTimeout(()=>{if(!peerReady){dlog('warn','PeerJS timeout');try{peer.destroy()}catch(e){}setTimeout(initPeer,3000)}},10000);
+  const tout=setTimeout(()=>{if(!peerReady){dlog('warn','PeerJS timeout');try{peer.destroy()}catch(e){}setTimeout(initPeer,6000)}},10000);
 
   peer.on('open',rid=>{
-    clearTimeout(tout);peerReady=true;
+    clearTimeout(tout);peerReady=true;_initCount=0;_peerJSGaveUp=false; // Reset on success
     if(rid!==me.peerId){me.peerId=rid;localStorage.setItem('wave_me',JSON.stringify(me));renderSidebarMe()}
     dlog('ok','✓ Online: '+rid);setStatus('online ✓');
     contacts.forEach((c,i)=>setTimeout(()=>dial(c),500+i*300));
-    keepAliveId=setInterval(()=>{contacts.forEach(c=>{const cn=conns[c.peerId];if(cn&&cn.open)try{cn.send({t:'ping'})}catch(e){delete conns[c.peerId];setOnline(c.peerId,false)};if(!cn||!cn.open)dial(c)})},12000);
+    if(keepAliveId)clearInterval(keepAliveId);
+    keepAliveId=setInterval(()=>{contacts.forEach(c=>{const cn=conns[c.peerId];if(cn&&cn.open)try{cn.send({t:'ping'})}catch(e){delete conns[c.peerId];setOnline(c.peerId,false)};if((!cn||!cn.open)&&peerReady)dial(c)})},12000);
   });
   peer.on('connection',conn=>{
     dlog('info','◀ Incoming: '+conn.peer.substring(0,16));
     const ex=conns[conn.peer];
-    if(ex&&ex.open){if(me.peerId>conn.peer){conn.close();return}try{ex.close()}catch(e){}}
+    if(ex&&ex.open){
+      // Don't replace manual connections with PeerJS ones
+      if(ex._dc){dlog('info','Keeping manual conn, ignoring PeerJS incoming');conn.close();return}
+      if(me.peerId>conn.peer){conn.close();return}
+      try{ex.close()}catch(e){}
+    }
     wireConn(conn);
   });
   peer.on('call',call=>onIncomingCall(call));
-  peer.on('disconnected',()=>{dlog('warn','Disconnected');peerReady=false;setStatus('reconnecting…');contacts.forEach(c=>setOnline(c.peerId,false));setTimeout(()=>{if(peer&&!peer.destroyed)try{peer.reconnect()}catch(e){initPeer()}else initPeer()},3000)});
+  peer.on('disconnected',()=>{
+    dlog('warn','PeerJS signaling disconnected');
+    peerReady=false;setStatus('reconnecting…');
+    // DON'T call initPeer — just try reconnect. Don't touch existing connections.
+    setTimeout(()=>{
+      if(peer&&!peer.destroyed&&!peer.open){
+        dlog('info','Trying peer.reconnect()…');
+        try{peer.reconnect()}catch(e){dlog('err','Reconnect failed: '+e.message);setTimeout(initPeer,6000)}
+      }
+    },5000);
+  });
   peer.on('error',e=>{
     dlog('err','PeerJS: '+e.type+' '+e.message);
-    if(e.type==='peer-unavailable')return;
-    if(e.type==='unavailable-id'){me.peerId=genId();localStorage.setItem('wave_me',JSON.stringify(me));renderSidebarMe();setTimeout(initPeer,1500);return}
-    clearTimeout(tout);setTimeout(initPeer,4000);
+    if(e.type==='peer-unavailable')return; // Not fatal
+    if(e.type==='unavailable-id'){me.peerId=genId();localStorage.setItem('wave_me',JSON.stringify(me));renderSidebarMe();setTimeout(initPeer,3000);return}
+    // For other errors, don't immediately reinit — wait longer
+    clearTimeout(tout);
+    setTimeout(initPeer,8000);
   });
 }
 
@@ -514,7 +555,7 @@ function qrDraw(u){const c=document.getElementById('qr-container');c.innerHTML='
 function saveContacts(){localStorage.setItem('wave_contacts',JSON.stringify(contacts))}
 function saveMsgs(){localStorage.setItem('wave_messages',JSON.stringify(messages))}
 function saveUnread(){localStorage.setItem('wave_unread',JSON.stringify(unread))}
-document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'&&me){if(!peerReady)initPeer();else contacts.forEach(c=>{if(!conns[c.peerId]?.open)dial(c)})}});
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'&&me){if(peerReady)contacts.forEach(c=>{if(!conns[c.peerId]?.open)dial(c)});else if(!_peerJSGaveUp&&(!peer||peer.destroyed))initPeer()}});
 window.addEventListener('hashchange',()=>{if(me)checkAddLink()});
 </script>
 </body>
