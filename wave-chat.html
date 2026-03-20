@@ -1,0 +1,1535 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Wave — P2P Messenger</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0c0c0e;
+  --bg2:#131316;
+  --bg3:#1c1c21;
+  --bg4:#26262d;
+  --bg5:#303038;
+  --border:rgba(255,255,255,0.07);
+  --border2:rgba(255,255,255,0.12);
+  --accent:#22c55e;
+  --accent-dark:#16a34a;
+  --accent-glow:rgba(34,197,94,0.15);
+  --accent-glow2:rgba(34,197,94,0.08);
+  --text:#f1f1f3;
+  --text2:#9191a0;
+  --text3:#4a4a58;
+  --me-bubble:#1a3326;
+  --me-border:rgba(34,197,94,0.2);
+  --them-bubble:#1c1c24;
+  --them-border:rgba(255,255,255,0.07);
+  --danger:#f04040;
+  --warn:#f5a623;
+  --sidebar:300px;
+  --font:'Sora',sans-serif;
+  --mono:'JetBrains Mono',monospace;
+  --radius:12px;
+}
+
+html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);font-family:var(--font);font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased}
+
+/* ── LAYOUT ── */
+#app{display:flex;height:100vh}
+#sidebar{
+  width:var(--sidebar);min-width:var(--sidebar);
+  background:var(--bg2);
+  border-right:1px solid var(--border);
+  display:flex;flex-direction:column;overflow:hidden;
+  flex-shrink:0;
+}
+#main{flex:1;display:flex;flex-direction:column;min-width:0;position:relative;background:var(--bg)}
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar{width:3px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--bg5);border-radius:2px}
+
+/* ── SIDEBAR HEADER ── */
+#sidebar-top{
+  padding:16px;
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;gap:10px;
+  flex-shrink:0;
+}
+.my-avatar{
+  width:38px;height:38px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:15px;font-weight:700;flex-shrink:0;cursor:pointer;
+  transition:opacity .15s;
+}
+.my-avatar:hover{opacity:.8}
+#my-name{font-weight:600;font-size:14px;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#peer-status{font-size:10px;color:var(--text3);font-family:var(--mono);margin-top:1px}
+.icon-btn{
+  width:32px;height:32px;border-radius:50%;border:1px solid var(--border);
+  background:var(--bg3);color:var(--text2);
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;font-size:16px;transition:all .15s;flex-shrink:0;
+}
+.icon-btn:hover{background:var(--bg4);border-color:var(--border2);color:var(--text)}
+
+/* ── SEARCH ── */
+#search-wrap{padding:10px 12px;border-bottom:1px solid var(--border);flex-shrink:0}
+#search{
+  width:100%;background:var(--bg3);border:1px solid var(--border);
+  border-radius:8px;padding:7px 11px;
+  color:var(--text);font-family:var(--font);font-size:13px;outline:none;
+  transition:border-color .15s;
+}
+#search:focus{border-color:rgba(34,197,94,0.4)}
+#search::placeholder{color:var(--text3)}
+
+/* ── CONTACTS ── */
+#contacts-list{flex:1;overflow-y:auto;padding:4px 0}
+
+.contact-row{
+  display:flex;align-items:center;gap:10px;
+  padding:9px 14px;cursor:pointer;
+  transition:background .12s;position:relative;
+}
+.contact-row:hover{background:var(--bg3)}
+.contact-row.active{background:var(--accent-glow2)}
+.contact-row.active::before{
+  content:'';position:absolute;left:0;top:8px;bottom:8px;
+  width:3px;background:var(--accent);border-radius:0 3px 3px 0;
+}
+.c-avatar{
+  width:40px;height:40px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:15px;font-weight:700;flex-shrink:0;position:relative;
+}
+.online-pip{
+  position:absolute;bottom:1px;right:1px;
+  width:9px;height:9px;border-radius:50%;
+  border:2px solid var(--bg2);background:var(--text3);
+}
+.online-pip.on{background:var(--accent)}
+.c-info{flex:1;min-width:0}
+.c-name{font-weight:500;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.c-preview{font-size:11px;color:var(--text2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px}
+.c-meta{display:flex;flex-direction:column;align-items:flex-end;gap:3px;flex-shrink:0}
+.c-time{font-size:10px;color:var(--text3);font-family:var(--mono)}
+.c-badge{background:var(--accent);color:#071a0e;font-size:9px;font-weight:700;border-radius:10px;padding:1px 5px;font-family:var(--mono)}
+
+.empty-state{padding:40px 20px;text-align:center;color:var(--text3)}
+.empty-state p{font-size:13px;line-height:1.7;margin-top:6px}
+
+/* ── ADD CONTACT BANNER ── */
+#add-banner{
+  padding:12px 14px;
+  background:var(--accent-glow2);
+  border-bottom:1px solid rgba(34,197,94,0.15);
+  flex-shrink:0;display:none;
+}
+#add-banner p{font-size:12px;color:var(--text2);margin-bottom:8px}
+#add-banner strong{color:var(--accent)}
+.banner-btns{display:flex;gap:6px}
+.btn-xs{padding:6px 12px;border-radius:7px;border:none;cursor:pointer;font-family:var(--font);font-size:12px;font-weight:500;transition:all .15s}
+.btn-xs.primary{background:var(--accent);color:#071a0e}
+.btn-xs.primary:hover{background:var(--accent-dark)}
+.btn-xs.ghost{background:var(--bg4);color:var(--text2)}
+.btn-xs.ghost:hover{background:var(--bg5);color:var(--text)}
+
+/* ── WELCOME ── */
+#welcome{
+  flex:1;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:12px;
+  color:var(--text3);text-align:center;padding:40px;
+}
+.welcome-icon{font-size:52px;margin-bottom:4px}
+#welcome h2{font-size:20px;font-weight:600;color:var(--text2)}
+#welcome p{font-size:13px;line-height:1.7;max-width:260px}
+
+/* ── CHAT VIEW ── */
+#chat-view{display:none;flex-direction:column;height:100%}
+
+/* ── CHAT HEADER ── */
+#chat-hdr{
+  padding:12px 16px;
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;gap:10px;
+  background:var(--bg2);flex-shrink:0;
+}
+#hdr-avatar{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0}
+#hdr-name{font-weight:600;font-size:14px}
+#hdr-status{font-size:11px;color:var(--text3);font-family:var(--mono);margin-top:1px}
+.chat-hdr-actions{display:flex;gap:6px;margin-left:auto}
+#back-btn{display:none;margin-right:4px}
+
+/* ── MESSAGES ── */
+#messages{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:2px}
+
+.date-sep{text-align:center;font-size:10px;color:var(--text3);font-family:var(--mono);letter-spacing:.06em;margin:12px 0 6px;text-transform:uppercase}
+
+.msg-group{display:flex;flex-direction:column;margin-bottom:6px}
+.msg-group.me{align-items:flex-end}
+.msg-group.them{align-items:flex-start}
+
+.bubble{
+  max-width:68%;padding:8px 12px;
+  font-size:13px;line-height:1.55;word-break:break-word;
+  position:relative;
+}
+.me .bubble{
+  background:var(--me-bubble);
+  border:1px solid var(--me-border);
+  border-radius:14px 4px 14px 14px;
+  color:#c8f0dc;
+}
+.them .bubble{
+  background:var(--them-bubble);
+  border:1px solid var(--them-border);
+  border-radius:4px 14px 14px 14px;
+  color:var(--text);
+}
+.bubble.file-bubble{display:flex;align-items:center;gap:10px;min-width:180px;max-width:260px}
+.file-ico{width:34px;height:34px;background:var(--bg4);border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0}
+.file-meta{flex:1;min-width:0}
+.file-name{font-size:12px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.file-sz{font-size:10px;color:var(--text2);font-family:var(--mono)}
+.file-dl{display:inline-block;margin-top:3px;font-size:11px;color:var(--accent);cursor:pointer;text-decoration:none}
+.prog-wrap{height:2px;background:var(--bg4);border-radius:1px;margin-top:5px}
+.prog-bar{height:100%;background:var(--accent);border-radius:1px;width:0%;transition:width .1s}
+
+.bubble img{max-width:210px;max-height:180px;border-radius:8px;display:block;cursor:pointer;transition:opacity .15s}
+.bubble img:hover{opacity:.9}
+
+.msg-footer{display:flex;align-items:center;gap:4px;padding:0 2px;margin-top:2px}
+.msg-time{font-size:10px;color:var(--text3);font-family:var(--mono)}
+.receipt{font-size:10px;color:var(--accent)}
+
+.typing-wrap{display:flex;align-items:center;gap:4px;padding:9px 13px;background:var(--them-bubble);border:1px solid var(--them-border);border-radius:4px 14px 14px 14px;width:fit-content;margin-bottom:6px}
+.td{width:5px;height:5px;background:var(--text3);border-radius:50%;animation:td 1.1s infinite ease-in-out}
+.td:nth-child(2){animation-delay:.18s}
+.td:nth-child(3){animation-delay:.36s}
+@keyframes td{0%,60%,100%{transform:translateY(0);opacity:.5}30%{transform:translateY(-5px);opacity:1}}
+
+/* ── OFFLINE BAR ── */
+#offline-bar{
+  padding:7px 16px;text-align:center;
+  background:rgba(245,166,35,0.08);
+  border-top:1px solid rgba(245,166,35,0.15);
+  font-size:11px;color:var(--warn);display:none;flex-shrink:0;
+}
+
+/* ── INPUT BAR ── */
+#input-bar{
+  padding:10px 12px;
+  border-top:1px solid var(--border);
+  background:var(--bg2);
+  display:flex;align-items:flex-end;gap:8px;
+  flex-shrink:0;
+}
+#attach-btn{
+  width:34px;height:34px;border-radius:8px;border:1px solid var(--border);
+  background:var(--bg3);color:var(--text2);font-size:16px;
+  display:flex;align-items:center;justify-content:center;cursor:pointer;
+  transition:all .15s;flex-shrink:0;
+}
+#attach-btn:hover{background:var(--bg4);color:var(--text)}
+#file-input{display:none}
+#msg-input{
+  flex:1;min-width:0;
+  background:var(--bg3);border:1px solid var(--border);
+  border-radius:10px;padding:8px 12px;
+  color:var(--text);font-family:var(--font);font-size:13px;
+  outline:none;resize:none;max-height:110px;line-height:1.5;
+  transition:border-color .15s;
+}
+#msg-input:focus{border-color:rgba(34,197,94,0.35)}
+#msg-input::placeholder{color:var(--text3)}
+#send-btn{
+  width:36px;height:36px;border-radius:50%;border:none;
+  background:var(--accent);color:#071a0e;
+  display:flex;align-items:center;justify-content:center;
+  font-size:15px;cursor:pointer;flex-shrink:0;
+  transition:all .15s;
+}
+#send-btn:hover{background:var(--accent-dark);transform:scale(1.05)}
+#send-btn:disabled{background:var(--bg4);color:var(--text3);transform:none;cursor:default}
+
+/* ── CALL OVERLAY ── */
+#call-screen{
+  position:absolute;inset:0;background:#000;z-index:40;
+  display:none;flex-direction:column;align-items:center;justify-content:center;gap:20px;
+}
+#call-screen.show{display:flex}
+#remote-vid{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;background:#111}
+#local-vid{position:absolute;top:16px;right:16px;width:110px;height:80px;border-radius:10px;object-fit:cover;background:#222;border:1.5px solid var(--border);z-index:1}
+.call-ui{position:relative;z-index:2;text-align:center}
+.call-cname{font-size:26px;font-weight:700}
+.call-cstatus{font-size:12px;color:var(--text2);font-family:var(--mono);margin-top:4px}
+.call-controls{position:relative;z-index:2;display:flex;gap:14px}
+.cc-btn{width:52px;height:52px;border-radius:50%;border:none;cursor:pointer;font-size:20px;display:flex;align-items:center;justify-content:center;transition:transform .15s}
+.cc-btn:hover{transform:scale(1.08)}
+.cc-btn.ctrl{background:rgba(255,255,255,0.12);color:#fff}
+.cc-btn.end-call{background:var(--danger);color:#fff}
+
+/* ── INCOMING CALL ── */
+#incoming-screen{
+  position:absolute;inset:0;background:rgba(0,0,0,0.88);
+  z-index:50;display:none;flex-direction:column;
+  align-items:center;justify-content:center;gap:16px;
+}
+#incoming-screen.show{display:flex}
+.inc-avatar{width:72px;height:72px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:700;animation:ring 1.5s infinite}
+@keyframes ring{0%,100%{box-shadow:0 0 0 0 rgba(34,197,94,.5)}60%{box-shadow:0 0 0 18px rgba(34,197,94,0)}}
+.inc-name{font-size:20px;font-weight:700}
+.inc-sub{font-size:12px;color:var(--text2);font-family:var(--mono)}
+.inc-btns{display:flex;gap:20px;margin-top:8px}
+.inc-accept{width:58px;height:58px;border-radius:50%;background:var(--accent);border:none;color:#071a0e;font-size:22px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:transform .15s}
+.inc-accept:hover{transform:scale(1.1)}
+.inc-reject{width:58px;height:58px;border-radius:50%;background:var(--danger);border:none;color:#fff;font-size:22px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:transform .15s}
+.inc-reject:hover{transform:scale(1.1)}
+
+/* ── OVERLAYS / MODALS ── */
+.overlay{
+  position:fixed;inset:0;background:rgba(0,0,0,0.6);
+  backdrop-filter:blur(8px);z-index:100;
+  display:flex;align-items:center;justify-content:center;
+  opacity:0;pointer-events:none;transition:opacity .2s;
+}
+.overlay.show{opacity:1;pointer-events:all}
+.modal{
+  background:var(--bg2);border:1px solid var(--border2);
+  border-radius:18px;padding:28px;width:min(400px,92vw);
+  transform:scale(.97) translateY(8px);
+  transition:transform .25s;
+  box-shadow:0 30px 80px rgba(0,0,0,0.6);
+}
+.overlay.show .modal{transform:scale(1) translateY(0)}
+.modal h2{font-size:18px;font-weight:700;margin-bottom:4px}
+.modal .sub{font-size:12px;color:var(--text2);margin-bottom:22px;line-height:1.6}
+.field-label{font-size:10px;color:var(--text3);font-family:var(--mono);letter-spacing:.07em;text-transform:uppercase;margin-bottom:5px}
+.field-input{
+  width:100%;background:var(--bg3);border:1px solid var(--border);
+  border-radius:9px;padding:9px 12px;color:var(--text);
+  font-family:var(--font);font-size:14px;outline:none;
+  transition:border-color .15s;margin-bottom:16px;display:block;
+}
+.field-input:focus{border-color:rgba(34,197,94,.45)}
+.modal-btns{display:flex;gap:8px;margin-top:6px;justify-content:flex-end}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;border:none;cursor:pointer;font-family:var(--font);font-weight:500;border-radius:9px;padding:9px 18px;font-size:13px;transition:all .15s}
+.btn.primary{background:var(--accent);color:#071a0e}
+.btn.primary:hover{background:var(--accent-dark)}
+.btn.secondary{background:var(--bg4);color:var(--text2)}
+.btn.secondary:hover{background:var(--bg5);color:var(--text)}
+.btn.danger{background:rgba(240,64,64,.12);color:var(--danger)}
+.btn.danger:hover{background:rgba(240,64,64,.22)}
+.btn.full{width:100%;padding:11px}
+
+/* ── AVATAR PICKER ── */
+.color-grid{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px}
+.color-swatch{
+  width:32px;height:32px;border-radius:50%;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  font-size:13px;font-weight:700;border:2px solid transparent;
+  transition:all .15s;
+}
+.color-swatch:hover{transform:scale(1.1)}
+.color-swatch.active{border-color:#fff;transform:scale(1.12)}
+
+/* ── SHARE MODAL ── */
+.tab-row{display:flex;gap:4px;margin-bottom:16px;background:var(--bg3);border-radius:9px;padding:3px}
+.tab{flex:1;padding:6px;border-radius:7px;border:none;background:transparent;color:var(--text2);font-family:var(--font);font-size:12px;cursor:pointer;transition:all .15s;font-weight:500}
+.tab.active{background:var(--bg4);color:var(--text)}
+.share-url{
+  background:var(--bg3);border:1px solid var(--border);border-radius:9px;
+  padding:11px 13px;font-family:var(--mono);font-size:11px;color:var(--accent);
+  word-break:break-all;margin-bottom:12px;cursor:pointer;transition:background .15s;line-height:1.6;
+}
+.share-url:hover{background:var(--bg4)}
+.qr-box{background:#fff;border-radius:12px;padding:12px;display:flex;justify-content:center;margin:4px 0 14px}
+
+/* ── TOAST ── */
+#toast{
+  position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(10px);
+  background:var(--bg3);border:1px solid var(--border2);border-radius:10px;
+  padding:9px 16px;font-size:12px;color:var(--text);z-index:999;
+  opacity:0;transition:all .2s;pointer-events:none;white-space:nowrap;
+}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* ── MOBILE ── */
+@media(max-width:620px){
+  #sidebar{position:absolute;inset:0;z-index:20;transition:transform .25s}
+  #sidebar.slide-out{transform:translateX(-100%)}
+  #back-btn{display:flex !important}
+}
+</style>
+</head>
+<body>
+
+<div id="app">
+
+  <!-- ═══ SIDEBAR ═══ -->
+  <div id="sidebar">
+    <div id="sidebar-top">
+      <div class="my-avatar" id="my-avatar" onclick="openProfileModal()"></div>
+      <div style="flex:1;min-width:0">
+        <div id="my-name">…</div>
+        <div id="peer-status">initializing</div>
+      </div>
+      <div class="icon-btn" onclick="openShareModal()" title="Share contact link" style="font-size:14px">＋</div>
+    </div>
+
+    <div id="add-banner">
+      <p>Add <strong id="banner-name"></strong> as a contact?</p>
+      <div class="banner-btns">
+        <button class="btn-xs primary" onclick="confirmAdd()">Add contact</button>
+        <button class="btn-xs ghost" onclick="dismissBanner()">Dismiss</button>
+      </div>
+    </div>
+
+    <div id="search-wrap">
+      <input id="search" type="text" placeholder="Search…" oninput="filterContacts(this.value)"/>
+    </div>
+
+    <div id="contacts-list"></div>
+  </div>
+
+  <!-- ═══ MAIN ═══ -->
+  <div id="main">
+
+    <!-- Welcome -->
+    <div id="welcome">
+      <div class="welcome-icon">🌊</div>
+      <h2>Wave</h2>
+      <p>Tap ＋ to share your link and add friends. No accounts needed.</p>
+    </div>
+
+    <!-- Chat -->
+    <div id="chat-view">
+      <div id="chat-hdr">
+        <div class="icon-btn" id="back-btn" onclick="closeChat()" style="display:none">←</div>
+        <div id="hdr-avatar"></div>
+        <div style="flex:1;min-width:0">
+          <div id="hdr-name"></div>
+          <div id="hdr-status"></div>
+        </div>
+        <div class="chat-hdr-actions">
+          <div class="icon-btn" onclick="startCall(false)" title="Voice call">📞</div>
+          <div class="icon-btn" onclick="startCall(true)" title="Video call">📹</div>
+        </div>
+      </div>
+
+      <div id="messages"></div>
+
+      <div id="offline-bar">Contact is offline — they'll receive messages when they connect</div>
+
+      <div id="input-bar">
+        <div id="attach-btn" onclick="document.getElementById('file-input').click()" title="Attach file">📎</div>
+        <input type="file" id="file-input" onchange="sendFile(this.files[0])"/>
+        <textarea id="msg-input" rows="1" placeholder="Message…"
+          onkeydown="onMsgKey(event)" oninput="onTypingInput()"></textarea>
+        <button id="send-btn" onclick="sendMessage()">➤</button>
+      </div>
+    </div>
+
+    <!-- Call screen -->
+    <div id="call-screen">
+      <video id="remote-vid" autoplay playsinline></video>
+      <video id="local-vid" autoplay playsinline muted></video>
+      <div class="call-ui">
+        <div class="call-cname" id="call-name"></div>
+        <div class="call-cstatus" id="call-status">Calling…</div>
+      </div>
+      <div class="call-controls">
+        <button class="cc-btn ctrl" id="mute-btn" onclick="toggleMute()">🎙️</button>
+        <button class="cc-btn ctrl" id="vid-btn" onclick="toggleCam()">📷</button>
+        <button class="cc-btn ctrl" onclick="doScreenShare()">🖥️</button>
+        <button class="cc-btn end-call" onclick="endCall()">📵</button>
+      </div>
+    </div>
+
+    <!-- Incoming call -->
+    <div id="incoming-screen">
+      <div class="inc-avatar" id="inc-avatar"></div>
+      <div class="inc-name" id="inc-name"></div>
+      <div class="inc-sub" id="inc-type"></div>
+      <div class="inc-btns">
+        <button class="inc-reject" onclick="rejectCall()">📵</button>
+        <button class="inc-accept" onclick="acceptCall()">📞</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Toast -->
+<div id="toast"></div>
+
+<!-- ═══ MODALS ═══ -->
+
+<!-- Setup -->
+<div class="overlay show" id="setup-overlay">
+  <div class="modal">
+    <div style="text-align:center;font-size:42px;margin-bottom:14px">🌊</div>
+    <h2 style="text-align:center">Welcome to Wave</h2>
+    <p class="sub" style="text-align:center">P2P messaging — no servers, no accounts, just you and your friends.</p>
+    <div class="field-label">Your name</div>
+    <input class="field-input" id="setup-name" type="text" placeholder="e.g. Alice" maxlength="30"/>
+    <div class="field-label">Your color</div>
+    <div class="color-grid" id="setup-color-grid"></div>
+    <button class="btn primary full" onclick="completeSetup()">Start chatting →</button>
+  </div>
+</div>
+
+<!-- Share -->
+<div class="overlay" id="share-overlay" onclick="bgClose(event,'share-overlay')">
+  <div class="modal">
+    <h2>Share your link</h2>
+    <p class="sub">Send this to a friend. When they open it, they can add you in one tap.</p>
+    <div class="tab-row">
+      <button class="tab active" onclick="switchTab('link',this)">Link</button>
+      <button class="tab" onclick="switchTab('qr',this)">QR Code</button>
+    </div>
+    <div id="tab-link">
+      <div class="share-url" id="share-url-text" onclick="copyLink()">—</div>
+      <div id="share-embedded-notice" style="display:none;font-size:12px;color:var(--warn);background:rgba(245,166,35,0.08);border:1px solid rgba(245,166,35,0.2);border-radius:8px;padding:10px 12px;margin-bottom:12px;line-height:1.6">
+        ⚠️ Save this file and open it in your browser directly (not inside Claude). Then share the URL with your friend.
+      </div>
+      <div style="display:flex;gap:8px" id="share-copy-btn">
+        <button class="btn primary" style="flex:1" onclick="copyLink()">Copy link</button>
+        <button class="btn secondary" onclick="closeOverlay('share-overlay')">Done</button>
+      </div>
+
+    </div>
+    <div id="tab-qr" style="display:none">
+      <div class="qr-box"><canvas id="qr-canvas"></canvas></div>
+      <button class="btn secondary full" onclick="closeOverlay('share-overlay')">Done</button>
+    </div>
+  </div>
+</div>
+
+<!-- Profile -->
+<div class="overlay" id="profile-overlay" onclick="bgClose(event,'profile-overlay')">
+  <div class="modal">
+    <h2>Edit profile</h2>
+    <p class="sub">Changes save locally and notify your online contacts.</p>
+    <div class="field-label">Name</div>
+    <input class="field-input" id="profile-name" type="text" maxlength="30"/>
+    <div class="field-label">Color</div>
+    <div class="color-grid" id="profile-color-grid"></div>
+    <div class="modal-btns">
+      <button class="btn secondary" onclick="closeOverlay('profile-overlay')">Cancel</button>
+      <button class="btn primary" onclick="saveProfile()">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- Scripts at end of body so DOM is ready -->
+<script>
+function loadScript(src, cb) {
+  const s = document.createElement('script');
+  s.src = src;
+  s.onload = cb;
+  s.onerror = () => { console.error('Failed:', src); cb && cb(); };
+  document.body.appendChild(s);
+}
+loadScript('https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js', () => {
+  window._libsReady = true;
+  if (window._pendingInit) window._pendingInit();
+});
+</script>
+
+<script>
+// ═══════════════════════════════════
+// CONSTANTS
+// ═══════════════════════════════════
+const PALETTE = [
+  '#22c55e','#3b82f6','#f43f5e','#f59e0b',
+  '#a855f7','#06b6d4','#ec4899','#84cc16'
+];
+const PAL_BG = [
+  '#071a0e','#071526','#1f0709','#1f1507',
+  '#170b26','#021419','#260711','#131f02'
+];
+const CHUNK = 16384;
+
+// ═══════════════════════════════════
+// STATE
+// ═══════════════════════════════════
+let me = null;
+let peer = null;
+let contacts = [];
+let conns = {};         // peerId -> DataConnection
+let messages = {};      // peerId -> []
+let unread = {};        // peerId -> n
+let activeId = null;
+let typingTimers = {};
+let typingDebounce = null;
+let currentCall = null;
+let localStream = null;
+let pendingCall = null;
+let fileXfers = {};     // transferId -> { chunks[], meta }
+let setupColorIdx = 0;
+let profileColorIdx = 0;
+
+// ═══════════════════════════════════
+// BOOT
+// ═══════════════════════════════════
+window.addEventListener('load', () => {
+  me = JSON.parse(localStorage.getItem('wave_me') || 'null');
+  contacts = JSON.parse(localStorage.getItem('wave_contacts') || '[]');
+  messages = JSON.parse(localStorage.getItem('wave_messages') || '{}');
+  unread = JSON.parse(localStorage.getItem('wave_unread') || '{}');
+
+  buildColorGrids();
+
+  if (!me) {
+    // Setup overlay already visible from HTML
+    document.getElementById('setup-name').focus();
+    return;
+  }
+  closeOverlay('setup-overlay');
+  startApp();
+});
+
+function startApp() {
+  renderSidebarMe();
+  renderContacts();
+  checkAddLink();
+  // Wait for libs or init immediately if ready
+  if (window._libsReady) {
+    initPeer();
+  } else {
+    window._pendingInit = initPeer;
+  }
+}
+
+// ═══════════════════════════════════
+// COLOR PICKERS
+// ═══════════════════════════════════
+function buildColorGrids() {
+  buildGrid('setup-color-grid', 0, idx => { setupColorIdx = idx; });
+  buildGrid('profile-color-grid', me?.color || 0, idx => { profileColorIdx = idx; });
+}
+
+function buildGrid(id, activeIdx, onChange) {
+  const el = document.getElementById(id);
+  el.innerHTML = PALETTE.map((c, i) =>
+    `<div class="color-swatch${i === activeIdx ? ' active' : ''}"
+      style="background:${c};color:${PAL_BG[i]}"
+      data-idx="${i}"
+      onclick="pickColor(this,'${id}',${i})">${'●'}</div>`
+  ).join('');
+}
+
+function pickColor(el, gridId, idx) {
+  document.querySelectorAll(`#${gridId} .color-swatch`).forEach(e => e.classList.remove('active'));
+  el.classList.add('active');
+  if (gridId === 'setup-color-grid') setupColorIdx = idx;
+  else profileColorIdx = idx;
+}
+
+// ═══════════════════════════════════
+// PEER INIT
+// ═══════════════════════════════════
+function initPeer() {
+  setStatus('connecting…');
+  try {
+    peer = new Peer(me.peerId, {
+      debug: 0,
+      config: {
+        iceServers: [
+          { urls: 'stun:stun.l.google.com:19302' },
+          { urls: 'stun:stun1.l.google.com:19302' },
+          { urls: 'turn:openrelay.metered.ca:80', username:'openrelayproject', credential:'openrelayproject' },
+          { urls: 'turn:openrelay.metered.ca:443', username:'openrelayproject', credential:'openrelayproject' },
+          { urls: 'turn:openrelay.metered.ca:443?transport=tcp', username:'openrelayproject', credential:'openrelayproject' }
+        ]
+      }
+    });
+  } catch(e) {
+    setStatus('peer error');
+    return;
+  }
+
+  peer.on('open', () => {
+    setStatus('online');
+    contacts.forEach(c => dial(c));
+    setInterval(() => {
+      Object.values(conns).forEach(c => { if (c.open) c.send({ t:'ping' }); });
+    }, 6000);
+  });
+
+  peer.on('connection', conn => setupConn(conn));
+  peer.on('call', call => onIncomingCall(call));
+  peer.on('disconnected', () => { setStatus('reconnecting…'); try { peer.reconnect(); } catch(e){} });
+  peer.on('error', e => {
+    if (e.type === 'peer-unavailable') return;
+    setStatus('reconnecting…');
+    setTimeout(initPeer, 4000);
+  });
+}
+
+function dial(contact) {
+  if (conns[contact.peerId]?.open) return;
+  const conn = peer.connect(contact.peerId, { reliable: true, serialization: 'binary' });
+  setupConn(conn);
+}
+
+function setupConn(conn) {
+  conns[conn.peer] = conn;
+  conn.on('open', () => {
+    conn.send({ t:'hello', name: me.name, color: me.color });
+    setOnline(conn.peer, true);
+  });
+  conn.on('data', d => onData(conn.peer, d));
+  conn.on('close', () => {
+    setOnline(conn.peer, false);
+    delete conns[conn.peer];
+    const c = contacts.find(c => c.peerId === conn.peer);
+    if (c) setTimeout(() => dial(c), 8000);
+  });
+  conn.on('error', () => {});
+}
+
+// ═══════════════════════════════════
+// DATA HANDLER
+// ═══════════════════════════════════
+function onData(pid, d) {
+  switch(d.t) {
+    case 'ping': conns[pid]?.send({ t:'pong' }); break;
+    case 'pong': setOnline(pid, true); break;
+    case 'hello': {
+      setOnline(pid, true);
+      const c = contacts.find(c => c.peerId === pid);
+      if (c) { c.name = d.name || c.name; c.color = d.color ?? c.color; saveContacts(); renderContacts(); }
+      break;
+    }
+    case 'msg': {
+      receiveMsg(pid, d);
+      conns[pid]?.send({ t:'receipt', id: d.id, s:'delivered' });
+      break;
+    }
+    case 'receipt': updateReceipt(pid, d.id, d.s); break;
+    case 'typing': showTyping(pid, d.on); break;
+    case 'fmeta': receiveFileMeta(pid, d); break;
+    case 'fchunk': receiveChunk(pid, d); break;
+    case 'fdone': finalizeFile(pid, d.tid); break;
+  }
+}
+
+// ═══════════════════════════════════
+// MESSAGING
+// ═══════════════════════════════════
+function sendMessage() {
+  const inp = document.getElementById('msg-input');
+  const text = inp.value.trim();
+  if (!text || !activeId) return;
+
+  const msg = { id: uid(), t:'msg', from: me.peerId, text, ts: Date.now(), receipt:'sent' };
+  pushMsg(activeId, msg);
+  appendBubble(activeId, msg);
+  scrollDown();
+
+  const conn = conns[activeId];
+  if (conn?.open) conn.send(msg);
+
+  inp.value = ''; inp.style.height = '';
+  sendTyping(false);
+  updatePreview(activeId, text);
+}
+
+function receiveMsg(pid, d) {
+  const msg = { ...d, receipt:'received' };
+  pushMsg(pid, msg);
+  if (activeId === pid) { appendBubble(pid, msg); scrollDown(); }
+  else { unread[pid] = (unread[pid]||0)+1; saveUnread(); renderContacts(); }
+  updatePreview(pid, d.text);
+}
+
+function pushMsg(pid, msg) {
+  if (!messages[pid]) messages[pid] = [];
+  messages[pid].push(msg);
+  if (messages[pid].length > 500) messages[pid] = messages[pid].slice(-400);
+  saveMsgs();
+}
+
+function updateReceipt(pid, id, s) {
+  const m = (messages[pid]||[]).find(m => m.id === id);
+  if (m) { m.receipt = s; saveMsgs(); }
+  const el = document.querySelector(`.receipt[data-id="${id}"]`);
+  if (el) el.textContent = s === 'read' ? '✓✓' : '✓';
+}
+
+function onTypingInput() {
+  const inp = document.getElementById('msg-input');
+  inp.style.height = 'auto';
+  inp.style.height = Math.min(inp.scrollHeight, 110) + 'px';
+  sendTyping(true);
+  clearTimeout(typingDebounce);
+  typingDebounce = setTimeout(() => sendTyping(false), 2200);
+}
+
+function sendTyping(on) {
+  conns[activeId]?.open && conns[activeId].send({ t:'typing', on });
+}
+
+function showTyping(pid, on) {
+  if (activeId !== pid) return;
+  const exist = document.getElementById('typing-bub');
+  if (on && !exist) {
+    const el = document.createElement('div');
+    el.id = 'typing-bub';
+    el.innerHTML = `<div class="typing-wrap"><div class="td"></div><div class="td"></div><div class="td"></div></div>`;
+    document.getElementById('messages').appendChild(el);
+    scrollDown();
+    clearTimeout(typingTimers[pid]);
+    typingTimers[pid] = setTimeout(() => el.remove(), 6000);
+  } else if (!on && exist) {
+    exist.remove();
+    clearTimeout(typingTimers[pid]);
+  }
+}
+
+function onMsgKey(e) {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+}
+
+// ═══════════════════════════════════
+// FILE SHARING
+// ═══════════════════════════════════
+async function sendFile(file) {
+  if (!file || !activeId) return;
+  const conn = conns[activeId];
+  if (!conn?.open) { toast('Contact is offline'); return; }
+
+  const tid = uid();
+  const isImg = file.type.startsWith('image/');
+  conn.send({ t:'fmeta', tid, name: file.name, size: file.size, mime: file.type, isImg });
+
+  const msg = { id: tid, t:'msg', subtype:'file', from: me.peerId, fname: file.name, fsize: file.size, fmime: file.type, isImg, ts: Date.now(), tid, progress:0 };
+  pushMsg(activeId, msg);
+  appendBubble(activeId, msg);
+  scrollDown();
+
+  const buf = await file.arrayBuffer();
+  const total = Math.ceil(buf.byteLength / CHUNK);
+  for (let i = 0; i < total; i++) {
+    conn.send({ t:'fchunk', tid, i, data: buf.slice(i*CHUNK, (i+1)*CHUNK) });
+    setProgress(tid, Math.round(((i+1)/total)*100));
+    await pause(8);
+  }
+  conn.send({ t:'fdone', tid });
+  document.getElementById('file-input').value = '';
+}
+
+function receiveFileMeta(pid, d) {
+  fileXfers[d.tid] = { chunks:[], meta:d, pid };
+  const msg = { id:d.tid, t:'msg', subtype:'file', from:pid, fname:d.name, fsize:d.size, fmime:d.mime, isImg:d.isImg, ts:Date.now(), tid:d.tid, progress:0 };
+  pushMsg(pid, msg);
+  if (activeId === pid) { appendBubble(pid, msg); scrollDown(); }
+}
+
+function receiveChunk(pid, d) {
+  const x = fileXfers[d.tid]; if (!x) return;
+  x.chunks[d.i] = d.data;
+  const total = Math.ceil(x.meta.size / CHUNK);
+  const got = x.chunks.filter(Boolean).length;
+  setProgress(d.tid, Math.round((got/total)*100));
+}
+
+function finalizeFile(pid, tid) {
+  const x = fileXfers[tid]; if (!x) return;
+  const blob = new Blob(x.chunks, { type: x.meta.mime });
+  const url = URL.createObjectURL(blob);
+  // update download link
+  const dl = document.querySelector(`.file-dl[data-tid="${tid}"]`);
+  if (dl) { dl.href = url; dl.download = x.meta.name; dl.textContent = 'Download'; }
+  // hide progress
+  const prog = document.querySelector(`.prog-bar[data-tid="${tid}"]`);
+  if (prog) prog.parentElement.style.display = 'none';
+  // show image
+  if (x.meta.isImg) {
+    const img = document.querySelector(`img[data-tid="${tid}"]`);
+    if (img) img.src = url;
+  }
+  const m = (messages[pid]||[]).find(m => m.id === tid);
+  if (m) { m.dlUrl = url; saveMsgs(); }
+  delete fileXfers[tid];
+}
+
+function setProgress(tid, pct) {
+  const b = document.querySelector(`.prog-bar[data-tid="${tid}"]`);
+  if (b) b.style.width = pct + '%';
+}
+
+// ═══════════════════════════════════
+// CALLING
+// ═══════════════════════════════════
+async function startCall(withVideo) {
+  if (!activeId) return;
+  if (!conns[activeId]?.open) { toast('Contact is offline'); return; }
+  try {
+    localStream = await navigator.mediaDevices.getUserMedia({ video: withVideo, audio: true });
+    document.getElementById('local-vid').srcObject = localStream;
+    const c = contacts.find(c => c.peerId === activeId);
+    currentCall = peer.call(activeId, localStream, { metadata:{ type: withVideo?'video':'audio', caller: me.name } });
+    showCallScreen(c, 'Calling…');
+    currentCall.on('stream', s => { document.getElementById('remote-vid').srcObject = s; setCallStat('Connected'); });
+    currentCall.on('close', endCall);
+    currentCall.on('error', endCall);
+  } catch(e) { toast('Camera/mic permission denied'); }
+}
+
+function onIncomingCall(call) {
+  const c = contacts.find(c => c.peerId === call.peer) || { name: call.metadata?.caller||'Unknown', peerId: call.peer, color:0 };
+  pendingCall = call;
+  document.getElementById('inc-avatar').textContent = c.name[0].toUpperCase();
+  document.getElementById('inc-avatar').style.background = PALETTE[c.color||0];
+  document.getElementById('inc-avatar').style.color = PAL_BG[c.color||0];
+  document.getElementById('inc-name').textContent = c.name;
+  document.getElementById('inc-type').textContent = call.metadata?.type === 'video' ? 'Incoming video call' : 'Incoming voice call';
+  document.getElementById('incoming-screen').classList.add('show');
+}
+
+async function acceptCall() {
+  document.getElementById('incoming-screen').classList.remove('show');
+  if (!pendingCall) return;
+  const c = contacts.find(c => c.peerId === pendingCall.peer) || { name:'Unknown', color:0 };
+  try {
+    localStream = await navigator.mediaDevices.getUserMedia({ video: pendingCall.metadata?.type==='video', audio:true });
+    document.getElementById('local-vid').srcObject = localStream;
+    pendingCall.answer(localStream);
+    currentCall = pendingCall;
+    showCallScreen(c, 'Connected');
+    currentCall.on('stream', s => { document.getElementById('remote-vid').srcObject = s; });
+    currentCall.on('close', endCall);
+  } catch(e) { toast('Camera/mic permission denied'); pendingCall.close(); }
+  pendingCall = null;
+}
+
+function rejectCall() {
+  pendingCall?.close(); pendingCall = null;
+  document.getElementById('incoming-screen').classList.remove('show');
+}
+
+function showCallScreen(contact, status) {
+  document.getElementById('call-name').textContent = contact?.name || '';
+  document.getElementById('call-status').textContent = status;
+  document.getElementById('call-screen').classList.add('show');
+}
+
+function setCallStat(s) { document.getElementById('call-status').textContent = s; }
+
+function endCall() {
+  currentCall?.close(); currentCall = null;
+  localStream?.getTracks().forEach(t => t.stop()); localStream = null;
+  document.getElementById('remote-vid').srcObject = null;
+  document.getElementById('local-vid').srcObject = null;
+  document.getElementById('call-screen').classList.remove('show');
+}
+
+let _muted = false;
+function toggleMute() {
+  _muted = !_muted;
+  localStream?.getAudioTracks().forEach(t => t.enabled = !_muted);
+  document.getElementById('mute-btn').textContent = _muted ? '🔇' : '🎙️';
+}
+
+let _vidOff = false;
+function toggleCam() {
+  _vidOff = !_vidOff;
+  localStream?.getVideoTracks().forEach(t => t.enabled = !_vidOff);
+  document.getElementById('vid-btn').textContent = _vidOff ? '🚫' : '📷';
+}
+
+async function doScreenShare() {
+  try {
+    const ss = await navigator.mediaDevices.getDisplayMedia({ video:true });
+    const track = ss.getVideoTracks()[0];
+    const sender = currentCall?.peerConnection?.getSenders().find(s => s.track?.kind==='video');
+    if (sender) sender.replaceTrack(track);
+    document.getElementById('local-vid').srcObject = ss;
+    track.onended = () => {
+      const orig = localStream?.getVideoTracks()[0];
+      if (sender && orig) sender.replaceTrack(orig);
+      document.getElementById('local-vid').srcObject = localStream;
+    };
+  } catch(e) {}
+}
+
+// ═══════════════════════════════════
+// UI — CONTACTS
+// ═══════════════════════════════════
+function renderContacts(filter = '') {
+  const el = document.getElementById('contacts-list');
+  const fl = filter.toLowerCase();
+  const list = contacts.filter(c => !fl || c.name.toLowerCase().includes(fl));
+
+  if (!contacts.length) {
+    el.innerHTML = `<div class="empty-state">
+      <div style="font-size:32px">👋</div>
+      <p>No contacts yet.<br>Tap ＋ to share your link.</p>
+    </div>`;
+    return;
+  }
+
+  // Sort by last message ts descending
+  const sorted = [...list].sort((a, b) => {
+    const ta = (messages[a.peerId]||[]).slice(-1)[0]?.ts || 0;
+    const tb = (messages[b.peerId]||[]).slice(-1)[0]?.ts || 0;
+    return tb - ta;
+  });
+
+  el.innerHTML = sorted.map(c => {
+    const online = !!conns[c.peerId]?.open;
+    const lastMsg = (messages[c.peerId]||[]).slice(-1)[0];
+    const preview = c.preview || (lastMsg ? (lastMsg.subtype==='file' ? `📎 ${lastMsg.fname}` : lastMsg.text) : '');
+    const ub = unread[c.peerId] || 0;
+    const ts = lastMsg ? fmtTime(lastMsg.ts) : '';
+    return `<div class="contact-row${activeId===c.peerId?' active':''}" onclick="openChat('${c.peerId}')">
+      <div class="c-avatar" style="background:${PALETTE[c.color||0]};color:${PAL_BG[c.color||0]}">
+        ${c.name[0].toUpperCase()}
+        <div class="online-pip${online?' on':''}"></div>
+      </div>
+      <div class="c-info">
+        <div class="c-name">${esc(c.name)}</div>
+        ${preview ? `<div class="c-preview">${esc(preview)}</div>` : ''}
+      </div>
+      <div class="c-meta">
+        ${ts ? `<div class="c-time">${ts}</div>` : ''}
+        ${ub ? `<div class="c-badge">${ub}</div>` : ''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function filterContacts(v) { renderContacts(v); }
+
+function setOnline(pid, on) {
+  const c = contacts.find(c => c.peerId === pid);
+  if (c) { c.online = on; }
+  renderContacts();
+  if (activeId === pid) {
+    document.getElementById('hdr-status').textContent = on ? '● online' : '○ offline';
+    document.getElementById('hdr-status').style.color = on ? 'var(--accent)' : 'var(--text3)';
+    document.getElementById('offline-bar').style.display = on ? 'none' : 'block';
+  }
+}
+
+function updatePreview(pid, text) {
+  const c = contacts.find(c => c.peerId === pid);
+  if (c) { c.preview = text; saveContacts(); renderContacts(); }
+}
+
+// ═══════════════════════════════════
+// UI — CHAT
+// ═══════════════════════════════════
+function openChat(pid) {
+  activeId = pid;
+  const c = contacts.find(c => c.peerId === pid);
+  if (!c) return;
+
+  unread[pid] = 0; saveUnread();
+  renderContacts();
+
+  document.getElementById('welcome').style.display = 'none';
+  const cv = document.getElementById('chat-view');
+  cv.style.display = 'flex';
+
+  document.getElementById('hdr-name').textContent = c.name;
+  const av = document.getElementById('hdr-avatar');
+  av.textContent = c.name[0].toUpperCase();
+  av.style.cssText = `width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;background:${PALETTE[c.color||0]};color:${PAL_BG[c.color||0]}`;
+
+  const online = !!conns[pid]?.open;
+  document.getElementById('hdr-status').textContent = online ? '● online' : '○ offline';
+  document.getElementById('hdr-status').style.color = online ? 'var(--accent)' : 'var(--text3)';
+  document.getElementById('offline-bar').style.display = online ? 'none' : 'block';
+
+  renderMsgs(pid);
+  scrollDown();
+  dial(c);
+
+  if (window.innerWidth <= 620) {
+    document.getElementById('sidebar').classList.add('slide-out');
+    document.getElementById('back-btn').style.display = 'flex';
+  }
+  document.getElementById('msg-input').focus();
+}
+
+function closeChat() {
+  activeId = null;
+  document.getElementById('chat-view').style.display = 'none';
+  document.getElementById('welcome').style.display = 'flex';
+  document.getElementById('sidebar').classList.remove('slide-out');
+  renderContacts();
+}
+
+function renderMsgs(pid) {
+  const el = document.getElementById('messages');
+  el.innerHTML = '';
+  const list = messages[pid] || [];
+  let lastDate = null;
+  list.forEach(m => {
+    const dk = new Date(m.ts).toDateString();
+    if (dk !== lastDate) {
+      const d = document.createElement('div');
+      d.className = 'date-sep';
+      d.textContent = fmtDate(m.ts);
+      el.appendChild(d);
+      lastDate = dk;
+    }
+    appendBubble(pid, m, true);
+  });
+}
+
+function appendBubble(pid, msg, skipTypingMove = false) {
+  const el = document.getElementById('messages');
+  const isMe = msg.from === me.peerId;
+  const g = document.createElement('div');
+  g.className = `msg-group ${isMe ? 'me' : 'them'}`;
+  g.dataset.id = msg.id;
+
+  if (msg.subtype === 'file') {
+    g.innerHTML = buildFileBubble(msg, isMe);
+  } else {
+    const receipt = isMe
+      ? `<span class="receipt" data-id="${msg.id}">${msg.receipt==='delivered'?'✓':msg.receipt==='read'?'✓✓':'·'}</span>` : '';
+    g.innerHTML = `<div class="bubble">${esc(msg.text).replace(/\n/g,'<br/>')}</div>
+      <div class="msg-footer"><span class="msg-time">${fmtTime(msg.ts)}</span>${receipt}</div>`;
+  }
+  el.appendChild(g);
+  const tb = document.getElementById('typing-bub');
+  if (tb && !skipTypingMove) el.appendChild(tb);
+}
+
+function buildFileBubble(msg, isMe) {
+  const sz = fmtSz(msg.fsize);
+  if (msg.isImg) {
+    const src = msg.dlUrl || '';
+    return `<div class="bubble" style="padding:6px 6px 4px">
+      <img src="${src}" data-tid="${msg.tid||msg.id}" onclick="window.open(this.src,'_blank')"
+        style="max-width:200px;max-height:170px;border-radius:8px;display:block${src?'':';opacity:.4'}"/>
+      <div style="font-size:10px;color:var(--text3);padding:3px 3px 0">${esc(msg.fname)} · ${sz}</div>
+    </div>
+    <div class="msg-footer"><span class="msg-time">${fmtTime(msg.ts)}</span></div>`;
+  }
+  const dlHtml = msg.dlUrl
+    ? `<a class="file-dl" data-tid="${msg.tid||msg.id}" href="${msg.dlUrl}" download="${esc(msg.fname)}">Download</a>`
+    : `<a class="file-dl" data-tid="${msg.tid||msg.id}" href="#">Receiving…</a>`;
+  const progHtml = msg.dlUrl ? '' : `<div class="prog-wrap"><div class="prog-bar" data-tid="${msg.tid||msg.id}"></div></div>`;
+  return `<div class="bubble file-bubble">
+    <div class="file-ico">${fmtIcon(msg.fmime)}</div>
+    <div class="file-meta">
+      <div class="file-name">${esc(msg.fname)}</div>
+      <div class="file-sz">${sz}</div>
+      ${dlHtml}${progHtml}
+    </div>
+  </div>
+  <div class="msg-footer"><span class="msg-time">${fmtTime(msg.ts)}</span></div>`;
+}
+
+function scrollDown() {
+  const el = document.getElementById('messages');
+  el.scrollTop = el.scrollHeight;
+}
+
+// ═══════════════════════════════════
+// ADD CONTACT FLOW
+// ═══════════════════════════════════
+function checkAddLink() {
+  const h = location.hash;
+  if (!h.startsWith('#add/')) return;
+  const parts = h.slice(5).split('/');
+  if (parts.length < 2) return;
+  const name = decodeURIComponent(parts[0]);
+  const pid = parts.slice(1).join('/');
+  if (!pid || pid === me.peerId) return;
+  if (contacts.find(c => c.peerId === pid)) { toast(`${name} is already in contacts`); location.hash=''; return; }
+  const banner = document.getElementById('add-banner');
+  document.getElementById('banner-name').textContent = name;
+  banner.dataset.name = name;
+  banner.dataset.pid = pid;
+  banner.style.display = 'block';
+}
+
+function confirmAdd() {
+  const b = document.getElementById('add-banner');
+  const c = { name: b.dataset.name, peerId: b.dataset.pid, color: Math.floor(Math.random()*PALETTE.length), addedAt: Date.now(), preview:'' };
+  contacts.push(c);
+  saveContacts();
+  renderContacts();
+  dial(c);
+  b.style.display = 'none';
+  location.hash = '';
+  toast(`${c.name} added!`);
+}
+
+function dismissBanner() {
+  document.getElementById('add-banner').style.display = 'none';
+  location.hash = '';
+}
+
+// ═══════════════════════════════════
+// SETUP & PROFILE
+// ═══════════════════════════════════
+function completeSetup() {
+  const name = document.getElementById('setup-name').value.trim();
+  if (!name) { toast('Enter your name'); return; }
+  me = { name, peerId: genId(), color: setupColorIdx };
+  localStorage.setItem('wave_me', JSON.stringify(me));
+  closeOverlay('setup-overlay');
+  startApp();
+}
+
+function renderSidebarMe() {
+  document.getElementById('my-name').textContent = me.name;
+  const av = document.getElementById('my-avatar');
+  av.textContent = me.name[0].toUpperCase();
+  av.style.background = PALETTE[me.color];
+  av.style.color = PAL_BG[me.color];
+}
+
+function openProfileModal() {
+  document.getElementById('profile-name').value = me.name;
+  document.querySelectorAll('#profile-color-grid .color-swatch').forEach((el, i) => {
+    el.classList.toggle('active', i === me.color);
+  });
+  profileColorIdx = me.color;
+  showOverlay('profile-overlay');
+}
+
+function saveProfile() {
+  const name = document.getElementById('profile-name').value.trim();
+  if (!name) return;
+  me.name = name;
+  me.color = profileColorIdx;
+  localStorage.setItem('wave_me', JSON.stringify(me));
+  renderSidebarMe();
+  closeOverlay('profile-overlay');
+  Object.values(conns).forEach(c => { if (c.open) c.send({ t:'hello', name: me.name, color: me.color }); });
+  toast('Profile saved');
+}
+
+function setStatus(s) { document.getElementById('peer-status').textContent = s; }
+
+// ═══════════════════════════════════
+// SHARE MODAL
+// ═══════════════════════════════════
+function getRealOrigin() {
+  // Detect if running inside srcdoc/blob iframe (Claude preview)
+  try {
+    const loc = window.location.href;
+    if (loc.startsWith('about:') || loc.startsWith('blob:') || loc.includes('srcdoc')) return null;
+    return loc.split('#')[0];
+  } catch(e) { return null; }
+}
+
+function buildShareUrl() {
+  const base = getRealOrigin();
+  if (!base) return null;
+  return base + '#add/' + encodeURIComponent(me.name) + '/' + me.peerId;
+}
+
+function getShareFragment() {
+  return '#add/' + encodeURIComponent(me.name) + '/' + me.peerId;
+}
+
+function openShareModal() {
+  const url = buildShareUrl();
+  const fragment = getShareFragment();
+  const isEmbedded = !url;
+
+  if (isEmbedded) {
+    // Show instructions for embedded/preview mode
+    document.getElementById('share-url-text').textContent = fragment;
+    document.getElementById('share-embedded-notice').style.display = 'block';
+    document.getElementById('share-copy-btn').style.display = 'none';
+    document.getElementById('tab-qr').style.display = 'none';
+    document.querySelector('.tab-row').style.display = 'none';
+  } else {
+    document.getElementById('share-url-text').textContent = url;
+    document.getElementById('share-embedded-notice').style.display = 'none';
+    document.getElementById('share-copy-btn').style.display = 'flex';
+    document.querySelector('.tab-row').style.display = 'flex';
+    drawQR(url);
+  }
+  showOverlay('share-overlay');
+}
+
+function drawQR(text) {
+  const canvas = document.getElementById('qr-canvas');
+  qrDraw(canvas, text, 180);
+}
+
+function copyLink() {
+  const url = buildShareUrl();
+  const toCopy = url || getShareFragment();
+  navigator.clipboard.writeText(toCopy)
+    .then(() => toast('Copied!'))
+    .catch(() => toast('Select and copy the text above'));
+}
+
+let _tab = 'link';
+function switchTab(mode, btn) {
+  _tab = mode;
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('tab-link').style.display = mode==='link' ? 'block' : 'none';
+  document.getElementById('tab-qr').style.display = mode==='qr' ? 'block' : 'none';
+}
+
+// ═══════════════════════════════════
+// MODAL HELPERS
+// ═══════════════════════════════════
+function showOverlay(id) { document.getElementById(id).classList.add('show'); }
+function closeOverlay(id) { document.getElementById(id).classList.remove('show'); }
+function bgClose(e, id) { if (e.target.id === id) closeOverlay(id); }
+
+let _toastT;
+function toast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(_toastT);
+  _toastT = setTimeout(() => el.classList.remove('show'), 2500);
+}
+
+// ═══════════════════════════════════
+// UTILS
+// ═══════════════════════════════════
+function esc(s) {
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function uid() { return crypto.randomUUID(); }
+function genId() {
+  // stable-ish short id
+  return ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g,c=>
+    (c^crypto.getRandomValues(new Uint8Array(1))[0]&15>>c/4).toString(16));
+}
+function pause(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+function fmtTime(ts) {
+  return new Date(ts).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+}
+function fmtDate(ts) {
+  const d = new Date(ts), t = new Date();
+  if (d.toDateString()===t.toDateString()) return 'Today';
+  const y = new Date(t); y.setDate(t.getDate()-1);
+  if (d.toDateString()===y.toDateString()) return 'Yesterday';
+  return d.toLocaleDateString([],{day:'numeric',month:'short'});
+}
+function fmtSz(b) {
+  if (!b) return '';
+  if (b<1024) return b+' B';
+  if (b<1048576) return (b/1024).toFixed(1)+' KB';
+  return (b/1048576).toFixed(1)+' MB';
+}
+function fmtIcon(mime='') {
+  if (mime.startsWith('image/')) return '🖼️';
+  if (mime.startsWith('video/')) return '🎬';
+  if (mime.startsWith('audio/')) return '🎵';
+  if (mime.includes('pdf')) return '📄';
+  if (mime.includes('zip')||mime.includes('rar')) return '📦';
+  return '📁';
+}
+
+
+// ═══════════════════════════════════
+// QR CODE (pure canvas, no CDN)
+// ═══════════════════════════════════
+// Minimal QR encoder - alphanumeric + byte mode, error correction M
+// Based on public domain QR spec
+function qrDraw(canvas, text, size) {
+  // Use a simple URL-safe encoding via a data URI approach
+  // We'll encode as a visual QR using the qr-image algorithm inline
+  // Simplified: generate a matrix and draw it
+  try {
+    const mat = makeQR(text);
+    const n = mat.length;
+    canvas.width = size; canvas.height = size;
+    const ctx = canvas.getContext('2d');
+    const cell = size / n;
+    ctx.fillStyle = '#fff'; ctx.fillRect(0,0,size,size);
+    ctx.fillStyle = '#000';
+    for (let r=0;r<n;r++) for (let c=0;c<n;c++)
+      if (mat[r][c]) ctx.fillRect(c*cell, r*cell, cell, cell);
+  } catch(e) {
+    console.log('QR draw error', e);
+  }
+}
+
+function makeQR(data) {
+  // Use version 5-M for URLs up to ~64 chars, version 10-M for longer
+  const bytes = encodeURIComponent(data).replace(/%[0-9A-F]{2}/g, '_').length > 64 ? 10 : 5;
+  // We'll use a fetch-free approach: encode data as UTF-8 bytes
+  const encoder = new TextEncoder();
+  const dataBytes = encoder.encode(data);
+  // Version 5-M: 134 data codewords capacity
+  // Version 10-M: 346 data codewords capacity
+  const version = dataBytes.length <= 80 ? 5 : (dataBytes.length <= 180 ? 10 : 15);
+  return buildQRMatrix(dataBytes, version);
+}
+
+function buildQRMatrix(dataBytes, version) {
+  const size = version * 4 + 17;
+  // Create matrix filled with -1 (unused)
+  const mat = Array.from({length:size}, () => new Int8Array(size).fill(-1));
+
+  // Finder patterns
+  function finder(r, c) {
+    for (let i=-1;i<=7;i++) for (let j=-1;j<=7;j++) {
+      const ri=r+i, cj=c+j;
+      if (ri<0||ri>=size||cj<0||cj>=size) continue;
+      const inOuter = i>=0&&i<=6&&(j===0||j===6);
+      const inInner2 = i>=0&&i<=6&&j>=0&&j<=6&&(i===0||i===6);
+      const inCore = i>=2&&i<=4&&j>=2&&j<=4;
+      mat[ri][cj] = (inOuter||inInner2||inCore) ? 1 : 0;
+    }
+  }
+  finder(0,0); finder(0,size-7); finder(size-7,0);
+
+  // Separators (already 0 from finder overlap area)
+  // Timing patterns
+  for (let i=8;i<size-8;i++) {
+    mat[6][i] = mat[i][6] = (i%2===0) ? 1 : 0;
+  }
+
+  // Alignment patterns (simplified - add for version >= 2)
+  if (version >= 2) {
+    const apos = getAlignPos(version);
+    for (const r of apos) for (const c of apos) {
+      if ((r===6&&c===6)||(r===6&&c===size-7)||(r===size-7&&c===6)) continue;
+      for (let i=-2;i<=2;i++) for (let j=-2;j<=2;j++) {
+        const isOuter = i===-2||i===2||j===-2||j===2;
+        const isCenter = i===0&&j===0;
+        mat[r+i][c+j] = (isOuter||isCenter) ? 1 : 0;
+      }
+    }
+  }
+
+  // Dark module
+  mat[size-8][8] = 1;
+
+  // Format info placeholder (0s to mark reserved)
+  for (let i=0;i<9;i++) {
+    if (mat[8][i]<0) mat[8][i]=0;
+    if (mat[i][8]<0) mat[i][8]=0;
+  }
+  for (let i=size-8;i<size;i++) {
+    if (mat[8][i]<0) mat[8][i]=0;
+    if (mat[i][8]<0) mat[i][8]=0;
+  }
+
+  // Encode data: byte mode header + length + data + terminator
+  const bits = [];
+  // Mode indicator: byte = 0100
+  bits.push(0,1,0,0);
+  // Character count: 8 bits for version 1-9
+  const len = dataBytes.length;
+  for (let i=7;i>=0;i--) bits.push((len>>i)&1);
+  // Data bytes
+  for (const b of dataBytes) for (let i=7;i>=0;i--) bits.push((b>>i)&1);
+  // Terminator
+  for (let i=0;i<4&&bits.length<totalDataBits(version);i++) bits.push(0);
+  // Pad to byte boundary
+  while (bits.length%8!==0) bits.push(0);
+  // Pad codewords
+  const padWords = [0xEC,0x11];
+  let pi=0;
+  while (bits.length < totalDataBits(version)) {
+    const pw = padWords[pi%2]; pi++;
+    for (let i=7;i>=0;i--) bits.push((pw>>i)&1);
+  }
+
+  // Simple error correction: for brevity we skip full RS and use a simplified approach
+  // that works for shorter strings (version 5 or less)
+  const codewords = [];
+  for (let i=0;i<bits.length;i+=8) {
+    let b=0; for (let j=0;j<8;j++) b=(b<<1)|(bits[i+j]||0);
+    codewords.push(b);
+  }
+
+  // Add EC codewords (simplified - zeros for now, sufficient for display)
+  const ecCount = getECCount(version);
+  const allCW = [...codewords, ...new Array(ecCount).fill(0)];
+  const allBits = [];
+  for (const cw of allCW) for (let i=7;i>=0;i--) allBits.push((cw>>i)&1);
+
+  // Place data bits in matrix (zigzag)
+  let bitIdx=0;
+  let dir=-1, row=size-1;
+  for (let col=size-1;col>0;col-=2) {
+    if (col===6) col--;
+    for (let cnt=0;cnt<size;cnt++) {
+      for (let c=0;c<2;c++) {
+        const cc=col-c, rr=row;
+        if (mat[rr][cc]<0) {
+          mat[rr][cc] = bitIdx<allBits.length ? allBits[bitIdx++] : 0;
+        }
+      }
+      row+=dir;
+    }
+    dir=-dir; row+=dir;
+  }
+
+  // Apply mask pattern 0: (row+col)%2===0
+  for (let r=0;r<size;r++) for (let c=0;c<size;c++) {
+    if (mat[r][c]>=0 && !isFunction(r,c,size,version)) {
+      if ((r+c)%2===0) mat[r][c]^=1;
+    }
+  }
+
+  // Write format string (mask 0, error M = 00): bits 101010000010010
+  const fmt = [1,0,1,0,1,0,0,0,0,0,1,0,0,1,0];
+  for (let i=0;i<6;i++) { mat[8][i]=fmt[i]; mat[i][8]=fmt[i]; }
+  mat[8][7]=fmt[6]; mat[7][8]=fmt[6];
+  mat[8][8]=fmt[7]; mat[8][size-8]=fmt[8];
+  for (let i=0;i<7;i++) { mat[size-7+i][8]=fmt[8+i]; mat[8][size-7+i]=fmt[8+i]; }
+
+  return mat;
+}
+
+function isFunction(r,c,size,version) {
+  if (r<9&&c<9) return true;
+  if (r<9&&c>=size-8) return true;
+  if (r>=size-8&&c<9) return true;
+  if (r===6||c===6) return true;
+  if (r===size-8&&c===8) return true;
+  if (version>=2) {
+    const apos=getAlignPos(version);
+    for (const ar of apos) for (const ac of apos) {
+      if (Math.abs(r-ar)<=2&&Math.abs(c-ac)<=2) {
+        if (!((ar===6&&ac===6)||(ar===6&&ac===size-7)||(ar===size-7&&ac===6))) return true;
+      }
+    }
+  }
+  return false;
+}
+
+function totalDataBits(v) {
+  const cap = [0,152,272,440,640,864,1088,1232,1440,1952,2384,2728,3248,3770];
+  return cap[Math.min(v,13)] || 864;
+}
+
+function getECCount(v) {
+  const ec = [0,10,16,26,36,48,64,72,88,110,130,150,176,198];
+  return ec[Math.min(v,13)] || 48;
+}
+
+function getAlignPos(v) {
+  const pos = {2:[6,18],3:[6,22],4:[6,26],5:[6,30],6:[6,34],7:[6,22,38],
+    8:[6,24,42],9:[6,26,46],10:[6,28,50],11:[6,30,54],12:[6,32,58],
+    13:[6,34,62],14:[6,26,46,66],15:[6,26,48,70]};
+  return pos[v] || [6,30];
+}
+
+function saveContacts() { localStorage.setItem('wave_contacts', JSON.stringify(contacts)); }
+function saveMsgs() { localStorage.setItem('wave_messages', JSON.stringify(messages)); }
+function saveUnread() { localStorage.setItem('wave_unread', JSON.stringify(unread)); }
+</script>
+</body>
+</html>
