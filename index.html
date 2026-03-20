@@ -272,21 +272,17 @@ async function getICEServers(){
   if(cachedICE && cachedICE.ts > Date.now()-3600000) return cachedICE.servers;
   dlog('info','Fetching Cloudflare TURN credentials…');
   try{
-    const r=await fetch('https://speed.cloudflare.com/turn-creds');
+    const r=await fetch('https://speed.cloudflare.com/turn-creds',{headers:{'Accept':'application/json'}});
+    if(!r.ok) throw new Error('HTTP '+r.status);
     const d=await r.json();
-    const servers=[
-      {urls:'stun:stun.l.google.com:19302'},
-      {urls:'stun:stun1.l.google.com:19302'},
-      {urls:'stun:stun.cloudflare.com:3478'},
-      {urls:d.urls.filter(u=>u.startsWith('turn:')),username:d.username,credential:d.credential},
-      {urls:d.urls.filter(u=>u.startsWith('turns:')),username:d.username,credential:d.credential},
-    ];
+    const servers=[{urls:'stun:stun.l.google.com:19302'},{urls:'stun:stun1.l.google.com:19302'},{urls:'stun:stun.cloudflare.com:3478'}];
+    if(d.urls) d.urls.forEach(u=>{if(u.startsWith('turn:')||u.startsWith('turns:'))servers.push({urls:u,username:d.username,credential:d.credential})});
     cachedICE={servers,ts:Date.now()};
-    dlog('ok','✓ Cloudflare TURN credentials obtained');
+    dlog('ok','✓ Cloudflare TURN: got '+servers.length+' servers');
     return servers;
   }catch(e){
-    dlog('warn','Cloudflare TURN fetch failed, using STUN only: '+e.message);
-    return [{urls:'stun:stun.l.google.com:19302'},{urls:'stun:stun1.l.google.com:19302'},{urls:'stun:stun.cloudflare.com:3478'}];
+    dlog('warn','Cloudflare TURN failed: '+e.message+' — adding freestun fallback');
+    return [{urls:'stun:stun.l.google.com:19302'},{urls:'stun:stun1.l.google.com:19302'},{urls:'stun:stun.cloudflare.com:3478'},{urls:'turn:freestun.net:3478',username:'free',credential:'free'},{urls:'turn:freestun.net:3478?transport=tcp',username:'free',credential:'free'}];
   }
 }
 
@@ -371,15 +367,38 @@ function dialPeerJS(contact){
 }
 
 function setupPeerJSConn(conn){
+  // Dedup: if both peers dial simultaneously, keep only one connection
+  const ex=conns[conn.peer];
+  if(ex&&ex.open){
+    if(me.peerId>conn.peer){dlog('info','Dedup: keeping existing, closing new');try{conn.close()}catch(e){}return}
+    else{dlog('info','Dedup: replacing with new');try{ex.close()}catch(e){}}
+  }
   conns[conn.peer]=conn;
   conn.on('open',()=>{
-    dlog('ok','✓ PeerJS connected: '+conn.peer.substring(0,16));
+    dlog('ok','✓ PeerJS DATA CHANNEL OPEN: '+conn.peer.substring(0,16));
     try{conn.send({t:'hello',name:me.name,color:me.color})}catch(e){}
     setOnline(conn.peer,true);flushPending(conn.peer);
   });
   conn.on('data',d=>onData(conn.peer,d));
-  conn.on('close',()=>{if(conns[conn.peer]===conn){delete conns[conn.peer];setOnline(conn.peer,false);const c=contacts.find(c=>c.peerId===conn.peer);if(c)setTimeout(()=>dialPeerJS(c),6000)}});
-  conn.on('error',e=>{dlog('err','Conn: '+e);if(conns[conn.peer]===conn){delete conns[conn.peer];setOnline(conn.peer,false)}});
+  conn.on('close',()=>{dlog('warn','PeerJS conn closed: '+conn.peer.substring(0,16));if(conns[conn.peer]===conn){delete conns[conn.peer];setOnline(conn.peer,false);const c=contacts.find(c=>c.peerId===conn.peer);if(c)setTimeout(()=>dialPeerJS(c),6000)}});
+  conn.on('error',e=>{dlog('err','PeerJS conn error: '+conn.peer.substring(0,16)+' — '+(e.type||e.message||e));if(conns[conn.peer]===conn){delete conns[conn.peer];setOnline(conn.peer,false)}});
+  // Monitor ICE state
+  setTimeout(()=>{
+    try{
+      const pc=conn.peerConnection;
+      if(!pc){dlog('warn','No peerConnection available for ICE monitoring');return}
+      dlog('info','ICE state: '+pc.iceConnectionState+' | gathering: '+pc.iceGatheringState);
+      pc.addEventListener('iceconnectionstatechange',()=>{
+        const s=pc.iceConnectionState;
+        const nm=contacts.find(c=>c.peerId===conn.peer)?.name||conn.peer.substring(0,12);
+        if(s==='connected'||s==='completed')dlog('ok','✓ ICE '+s+' with '+nm);
+        else if(s==='failed')dlog('err','✗ ICE FAILED with '+nm+' — TURN server needed or both behind strict NAT');
+        else if(s==='checking')dlog('info','ICE checking '+nm+'…');
+        else if(s==='disconnected')dlog('warn','ICE disconnected '+nm);
+        else dlog('info','ICE: '+s+' '+nm);
+      });
+    }catch(e){dlog('warn','ICE monitor: '+e.message)}
+  },200);
 }
 
 // ═══════════════════════════════════════════
