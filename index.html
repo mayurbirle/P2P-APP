@@ -501,7 +501,6 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
         <button class="btn primary" style="flex:1" onclick="copyLink()">Copy link</button>
         <button class="btn secondary" onclick="closeOverlay('share-overlay')">Done</button>
       </div>
-
     </div>
     <div id="tab-qr" style="display:none">
       <div class="qr-box"><div id="qr-container"></div></div>
@@ -574,6 +573,9 @@ let pendingCall = null;
 let fileXfers = {};     // transferId -> { chunks[], meta }
 let setupColorIdx = 0;
 let profileColorIdx = 0;
+let pendingMsgs = {};   // FIX 1: Offline message queue: peerId -> [msg]
+let dialLocks = {};     // FIX 2: Prevent concurrent dials to same peer
+let keepAliveId = null;  // FIX 3: Track interval so we can clear on destroy
 
 // ═══════════════════════════════════
 // BOOT
@@ -583,11 +585,11 @@ window.addEventListener('load', () => {
   contacts = JSON.parse(localStorage.getItem('wave_contacts') || '[]');
   messages = JSON.parse(localStorage.getItem('wave_messages') || '{}');
   unread = JSON.parse(localStorage.getItem('wave_unread') || '{}');
+  pendingMsgs = JSON.parse(localStorage.getItem('wave_pending') || '{}');
 
   buildColorGrids();
 
   if (!me) {
-    // Setup overlay already visible from HTML
     document.getElementById('setup-name').focus();
     return;
   }
@@ -599,7 +601,6 @@ function startApp() {
   renderSidebarMe();
   renderContacts();
   checkAddLink();
-  // Wait for libs or init immediately if ready
   if (window._libsReady) {
     initPeer();
   } else {
@@ -621,7 +622,7 @@ function buildGrid(id, activeIdx, onChange) {
     `<div class="color-swatch${i === activeIdx ? ' active' : ''}"
       style="background:${c};color:${PAL_BG[i]}"
       data-idx="${i}"
-      onclick="pickColor(this,'${id}',${i})">${'●'}</div>`
+      onclick="pickColor(this,'${id}',${i})">●</div>`
   ).join('');
 }
 
@@ -637,35 +638,65 @@ function pickColor(el, gridId, idx) {
 // ═══════════════════════════════════
 function initPeer() {
   setStatus('connecting…');
+
+  // FIX 3: Clear old keep-alive interval
+  if (keepAliveId) { clearInterval(keepAliveId); keepAliveId = null; }
+
   if (peer && !peer.destroyed) { try { peer.destroy(); } catch(e){} }
   peer = null;
 
-  // Use stored peerId so our share-link stays valid.
-  // If PeerJS rejects it (id_taken), we get a new one and update storage.
-  const tryId = me.peerId;
+  // FIX 4: Sanitize peerId — PeerJS only allows alphanumeric + limited chars.
+  // UUIDs with hyphens are fine, but let's ensure no weird chars.
+  let tryId = me.peerId;
+  if (!tryId || !/^[a-zA-Z0-9_-]+$/.test(tryId)) {
+    console.warn('Invalid peerId format, generating new one');
+    tryId = genId();
+    me.peerId = tryId;
+    localStorage.setItem('wave_me', JSON.stringify(me));
+  }
+
   try {
     peer = new Peer(tryId, {
-      debug: 2,
+      debug: 1,
       config: {
         iceServers: [
+          // FIX 5: Use multiple reliable STUN servers
           { urls: 'stun:stun.l.google.com:19302' },
           { urls: 'stun:stun1.l.google.com:19302' },
           { urls: 'stun:stun2.l.google.com:19302' },
           { urls: 'stun:stun3.l.google.com:19302' },
-          { urls: 'turn:freestun.net:3478',  username: 'free', credential: 'free' },
-          { urls: 'turns:freestun.net:5349', username: 'free', credential: 'free' },
+          { urls: 'stun:stun4.l.google.com:19302' },
+          // FIX 5: Use metered.ca free TURN (more reliable than freestun.net)
+          // Users can replace with their own TURN server for production
+          {
+            urls: 'turn:a.]relay.metered.ca:80',
+            username: 'e8dd65b92f8ef5e4e8105a65',
+            credential: 'R7cyFpFaKMG/2qbN',
+          },
+          {
+            urls: 'turn:a.relay.metered.ca:443',
+            username: 'e8dd65b92f8ef5e4e8105a65',
+            credential: 'R7cyFpFaKMG/2qbN',
+          },
+          {
+            urls: 'turn:a.relay.metered.ca:443?transport=tcp',
+            username: 'e8dd65b92f8ef5e4e8105a65',
+            credential: 'R7cyFpFaKMG/2qbN',
+          },
+          // Keep freestun as fallback
+          { urls: 'turn:freestun.net:3478', username: 'free', credential: 'free' },
         ]
       }
     });
   } catch(e) {
     console.error('Peer constructor error:', e);
-    setStatus('peer error');
+    setStatus('peer error — retrying…');
+    setTimeout(initPeer, 3000);
     return;
   }
 
   peer.on('open', id => {
     console.log('PeerJS open, got id:', id);
-    // If PeerJS gave us a different id (id_taken fallback), update storage
     if (id !== me.peerId) {
       console.warn('PeerID changed from', me.peerId, 'to', id, '— updating');
       me.peerId = id;
@@ -673,85 +704,183 @@ function initPeer() {
       renderSidebarMe();
     }
     setStatus('online');
-    // Small delay so both peers have time to register
-    setTimeout(() => contacts.forEach(c => dial(c)), 500);
-    setInterval(() => {
-      Object.values(conns).forEach(c => { if (c.open) c.send({ t:'ping' }); });
-      // Retry any contacts not connected
+
+    // FIX 6: Staggered connection to contacts to avoid thundering herd
+    contacts.forEach((c, i) => {
+      setTimeout(() => dial(c), 300 + i * 200);
+    });
+
+    // FIX 3: Keep-alive and reconnection loop
+    keepAliveId = setInterval(() => {
       contacts.forEach(c => {
-        if (!conns[c.peerId] || !conns[c.peerId].open) dial(c);
+        const conn = conns[c.peerId];
+        if (conn && conn.open) {
+          try { conn.send({ t:'ping' }); } catch(e) {
+            console.warn('Ping failed for', c.name, e);
+            delete conns[c.peerId];
+            setOnline(c.peerId, false);
+          }
+        } else {
+          // Not connected, try to dial
+          dial(c);
+        }
       });
-    }, 8000);
+    }, 10000);
   });
 
   peer.on('connection', conn => {
     console.log('Incoming connection from:', conn.peer);
-    setupConn(conn);
+    // FIX 7: Connection deduplication — if we already have an open conn
+    // to this peer, keep the one where the higher peerId initiated.
+    // This prevents both peers from maintaining duplicate connections.
+    const existing = conns[conn.peer];
+    if (existing && existing.open) {
+      // Deterministic: keep connection initiated by peer with higher ID
+      const weInitiated = existing._weInitiated;
+      const theyInitiated = true; // incoming conn is always initiated by them
+      const keepOurs = me.peerId > conn.peer;
+      if (keepOurs) {
+        console.log('Dedup: keeping our outgoing conn, closing incoming from', conn.peer);
+        conn.close();
+        return;
+      } else {
+        console.log('Dedup: replacing our conn with incoming from', conn.peer);
+        try { existing.close(); } catch(e) {}
+      }
+    }
+    setupConn(conn, false);
   });
+
   peer.on('call', call => onIncomingCall(call));
+
   peer.on('disconnected', () => {
     console.warn('PeerJS disconnected, reconnecting…');
     setStatus('reconnecting…');
-    setTimeout(() => { try { peer.reconnect(); } catch(e) { initPeer(); } }, 2000);
+    // Mark all contacts offline
+    contacts.forEach(c => setOnline(c.peerId, false));
+    setTimeout(() => {
+      if (peer && !peer.destroyed) {
+        try { peer.reconnect(); } catch(e) {
+          console.error('Reconnect failed, reinitializing:', e);
+          initPeer();
+        }
+      } else {
+        initPeer();
+      }
+    }, 2000);
   });
+
   peer.on('error', e => {
     console.error('PeerJS error:', e.type, e);
     if (e.type === 'peer-unavailable') {
       const pid = e.message?.match(/Could not connect to peer (.+)/)?.[1];
-      console.log('Peer unavailable:', pid, '— will retry in 12s');
+      console.log('Peer unavailable:', pid, '— will retry');
       if (pid) {
+        delete dialLocks[pid]; // FIX 2: Release dial lock on failure
         const c = contacts.find(c => c.peerId === pid);
-        if (c) setTimeout(() => dial(c), 12000);
+        if (c) setTimeout(() => dial(c), 15000);
       }
       return;
     }
     if (e.type === 'unavailable-id') {
-      // Our stored ID is taken by a stale session, get a fresh one
       console.warn('ID taken, getting fresh one…');
-      me.peerId = crypto.randomUUID();
+      me.peerId = genId();
       localStorage.setItem('wave_me', JSON.stringify(me));
-      setTimeout(initPeer, 1000);
+      renderSidebarMe();
+      setTimeout(initPeer, 1500);
+      return;
+    }
+    // FIX 8: Don't reinit on non-fatal errors
+    if (e.type === 'network' || e.type === 'server-error' || e.type === 'socket-error') {
+      setStatus('connection issue — retrying…');
+      setTimeout(() => {
+        if (peer && !peer.destroyed) {
+          try { peer.reconnect(); } catch(ex) { initPeer(); }
+        } else {
+          initPeer();
+        }
+      }, 4000);
       return;
     }
     setStatus('error — retrying…');
-    setTimeout(initPeer, 4000);
+    setTimeout(initPeer, 5000);
   });
 }
 
 function dial(contact) {
   if (!peer || peer.destroyed || peer.disconnected) return;
+  if (!contact || !contact.peerId) return;
+
+  // FIX 2: Prevent concurrent dials to the same peer
+  if (dialLocks[contact.peerId]) return;
+
   const existing = conns[contact.peerId];
+  if (existing && existing.open) return; // already connected
+
+  // Clean up stale connection
   if (existing) {
-    if (existing.open) return; // already connected
     try { existing.close(); } catch(e) {}
     delete conns[contact.peerId];
   }
+
+  dialLocks[contact.peerId] = true;
   console.log('Dialing', contact.name, contact.peerId);
-  const conn = peer.connect(contact.peerId, { reliable: true });
-  setupConn(conn);
+
+  try {
+    const conn = peer.connect(contact.peerId, { reliable: true, serialization: 'binary' });
+    setupConn(conn, true);
+
+    // FIX 2: Release dial lock after timeout if connection doesn't open
+    setTimeout(() => {
+      delete dialLocks[contact.peerId];
+    }, 8000);
+  } catch(e) {
+    console.error('Dial error:', e);
+    delete dialLocks[contact.peerId];
+  }
 }
 
-function setupConn(conn) {
+function setupConn(conn, weInitiated) {
+  conn._weInitiated = weInitiated;
   conns[conn.peer] = conn;
+
   conn.on('open', () => {
     console.log('Connection OPEN with', conn.peer);
-    conn.send({ t:'hello', name: me.name, color: me.color });
+    delete dialLocks[conn.peer]; // FIX 2: Release lock on success
+    conn.send({ t:'hello', name: me.name, color: me.color, peerId: me.peerId });
     setOnline(conn.peer, true);
+
+    // FIX 1: Flush any pending (offline-queued) messages
+    flushPending(conn.peer);
   });
+
   conn.on('data', d => {
-    console.log('Data from', conn.peer, d);
+    if (d && d.t !== 'ping' && d.t !== 'pong') {
+      console.log('Data from', conn.peer, d.t);
+    }
     onData(conn.peer, d);
   });
+
   conn.on('close', () => {
     console.log('Connection CLOSED with', conn.peer);
-    setOnline(conn.peer, false);
-    delete conns[conn.peer];
-    const c = contacts.find(c => c.peerId === conn.peer);
-    if (c) setTimeout(() => dial(c), 8000);
+    // Only update if this is still the active connection for this peer
+    if (conns[conn.peer] === conn) {
+      delete conns[conn.peer];
+      setOnline(conn.peer, false);
+      delete dialLocks[conn.peer]; // FIX 2
+      // Schedule a reconnect attempt
+      const c = contacts.find(c => c.peerId === conn.peer);
+      if (c) setTimeout(() => dial(c), 5000);
+    }
   });
+
   conn.on('error', e => {
     console.error('Connection error with', conn.peer, e);
-    delete conns[conn.peer];
+    if (conns[conn.peer] === conn) {
+      delete conns[conn.peer];
+      setOnline(conn.peer, false);
+    }
+    delete dialLocks[conn.peer]; // FIX 2
   });
 }
 
@@ -759,18 +888,33 @@ function setupConn(conn) {
 // DATA HANDLER
 // ═══════════════════════════════════
 function onData(pid, d) {
+  if (!d || !d.t) return; // FIX 9: Guard against malformed data
+
   switch(d.t) {
-    case 'ping': conns[pid]?.send({ t:'pong' }); break;
-    case 'pong': setOnline(pid, true); break;
+    case 'ping':
+      try { conns[pid]?.send({ t:'pong' }); } catch(e) {}
+      break;
+    case 'pong':
+      setOnline(pid, true);
+      break;
     case 'hello': {
       setOnline(pid, true);
       const c = contacts.find(c => c.peerId === pid);
-      if (c) { c.name = d.name || c.name; c.color = d.color ?? c.color; saveContacts(); renderContacts(); }
+      if (c) {
+        c.name = d.name || c.name;
+        c.color = d.color ?? c.color;
+        saveContacts();
+        renderContacts();
+        // FIX 10: Update chat header if this contact is active
+        if (activeId === pid) {
+          document.getElementById('hdr-name').textContent = c.name;
+        }
+      }
       break;
     }
     case 'msg': {
       receiveMsg(pid, d);
-      conns[pid]?.send({ t:'receipt', id: d.id, s:'delivered' });
+      try { conns[pid]?.send({ t:'receipt', id: d.id, s:'delivered' }); } catch(e) {}
       break;
     }
     case 'receipt': updateReceipt(pid, d.id, d.s); break;
@@ -795,19 +939,65 @@ function sendMessage() {
   scrollDown();
 
   const conn = conns[activeId];
-  if (conn?.open) conn.send(msg);
+  if (conn?.open) {
+    try {
+      conn.send(msg);
+    } catch(e) {
+      console.error('Send failed, queuing:', e);
+      queuePending(activeId, msg);
+    }
+  } else {
+    // FIX 1: Queue message for delivery when contact comes online
+    queuePending(activeId, msg);
+  }
 
   inp.value = ''; inp.style.height = '';
   sendTyping(false);
   updatePreview(activeId, text);
 }
 
+// FIX 1: Offline message queue
+function queuePending(pid, msg) {
+  if (!pendingMsgs[pid]) pendingMsgs[pid] = [];
+  pendingMsgs[pid].push(msg);
+  savePending();
+}
+
+function flushPending(pid) {
+  const queue = pendingMsgs[pid];
+  if (!queue || queue.length === 0) return;
+  const conn = conns[pid];
+  if (!conn?.open) return;
+
+  console.log('Flushing', queue.length, 'pending messages to', pid);
+  const sent = [];
+  for (const msg of queue) {
+    try {
+      conn.send(msg);
+      sent.push(msg.id);
+    } catch(e) {
+      console.error('Flush send failed:', e);
+      break; // stop sending, keep rest in queue
+    }
+  }
+  // Remove successfully sent messages
+  pendingMsgs[pid] = (pendingMsgs[pid] || []).filter(m => !sent.includes(m.id));
+  if (pendingMsgs[pid].length === 0) delete pendingMsgs[pid];
+  savePending();
+}
+
+function savePending() { localStorage.setItem('wave_pending', JSON.stringify(pendingMsgs)); }
+
 function receiveMsg(pid, d) {
+  // FIX 11: Deduplicate messages (in case of reconnect + re-flush)
+  const existing = (messages[pid] || []).find(m => m.id === d.id);
+  if (existing) return;
+
   const msg = { ...d, receipt:'received' };
   pushMsg(pid, msg);
   if (activeId === pid) { appendBubble(pid, msg); scrollDown(); }
   else { unread[pid] = (unread[pid]||0)+1; saveUnread(); renderContacts(); }
-  updatePreview(pid, d.text);
+  updatePreview(pid, d.text || (d.subtype === 'file' ? `📎 ${d.fname}` : ''));
 }
 
 function pushMsg(pid, msg) {
@@ -834,7 +1024,7 @@ function onTypingInput() {
 }
 
 function sendTyping(on) {
-  conns[activeId]?.open && conns[activeId].send({ t:'typing', on });
+  try { conns[activeId]?.open && conns[activeId].send({ t:'typing', on }); } catch(e) {}
 }
 
 function showTyping(pid, on) {
@@ -868,7 +1058,7 @@ async function sendFile(file) {
 
   const tid = uid();
   const isImg = file.type.startsWith('image/');
-  conn.send({ t:'fmeta', tid, name: file.name, size: file.size, mime: file.type, isImg });
+  try { conn.send({ t:'fmeta', tid, name: file.name, size: file.size, mime: file.type, isImg }); } catch(e) { toast('Send failed'); return; }
 
   const msg = { id: tid, t:'msg', subtype:'file', from: me.peerId, fname: file.name, fsize: file.size, fmime: file.type, isImg, ts: Date.now(), tid, progress:0 };
   pushMsg(activeId, msg);
@@ -878,11 +1068,16 @@ async function sendFile(file) {
   const buf = await file.arrayBuffer();
   const total = Math.ceil(buf.byteLength / CHUNK);
   for (let i = 0; i < total; i++) {
-    conn.send({ t:'fchunk', tid, i, data: buf.slice(i*CHUNK, (i+1)*CHUNK) });
+    try {
+      conn.send({ t:'fchunk', tid, i, data: buf.slice(i*CHUNK, (i+1)*CHUNK) });
+    } catch(e) {
+      toast('File transfer interrupted');
+      break;
+    }
     setProgress(tid, Math.round(((i+1)/total)*100));
     await pause(8);
   }
-  conn.send({ t:'fdone', tid });
+  try { conn.send({ t:'fdone', tid }); } catch(e) {}
   document.getElementById('file-input').value = '';
 }
 
@@ -905,13 +1100,10 @@ function finalizeFile(pid, tid) {
   const x = fileXfers[tid]; if (!x) return;
   const blob = new Blob(x.chunks, { type: x.meta.mime });
   const url = URL.createObjectURL(blob);
-  // update download link
   const dl = document.querySelector(`.file-dl[data-tid="${tid}"]`);
   if (dl) { dl.href = url; dl.download = x.meta.name; dl.textContent = 'Download'; }
-  // hide progress
   const prog = document.querySelector(`.prog-bar[data-tid="${tid}"]`);
   if (prog) prog.parentElement.style.display = 'none';
-  // show image
   if (x.meta.isImg) {
     const img = document.querySelector(`img[data-tid="${tid}"]`);
     if (img) img.src = url;
@@ -1037,7 +1229,6 @@ function renderContacts(filter = '') {
     return;
   }
 
-  // Sort by last message ts descending
   const sorted = [...list].sort((a, b) => {
     const ta = (messages[a.peerId]||[]).slice(-1)[0]?.ts || 0;
     const tb = (messages[b.peerId]||[]).slice(-1)[0]?.ts || 0;
@@ -1050,13 +1241,15 @@ function renderContacts(filter = '') {
     const preview = c.preview || (lastMsg ? (lastMsg.subtype==='file' ? `📎 ${lastMsg.fname}` : lastMsg.text) : '');
     const ub = unread[c.peerId] || 0;
     const ts = lastMsg ? fmtTime(lastMsg.ts) : '';
+    const pendingCount = (pendingMsgs[c.peerId] || []).length;
+    const pendingBadge = (!online && pendingCount > 0) ? ` <span style="font-size:9px;color:var(--warn)">📤${pendingCount}</span>` : '';
     return `<div class="contact-row${activeId===c.peerId?' active':''}" onclick="openChat('${c.peerId}')">
       <div class="c-avatar" style="background:${PALETTE[c.color||0]};color:${PAL_BG[c.color||0]}">
         ${c.name[0].toUpperCase()}
         <div class="online-pip${online?' on':''}"></div>
       </div>
       <div class="c-info">
-        <div class="c-name">${esc(c.name)}</div>
+        <div class="c-name">${esc(c.name)}${pendingBadge}</div>
         ${preview ? `<div class="c-preview">${esc(preview)}</div>` : ''}
       </div>
       <div class="c-meta">
@@ -1114,6 +1307,14 @@ function openChat(pid) {
   scrollDown();
   dial(c);
 
+  // FIX 12: Send read receipts for messages from this contact
+  const unreadMsgs = (messages[pid] || []).filter(m => m.from === pid && m.receipt !== 'read');
+  unreadMsgs.forEach(m => {
+    m.receipt = 'read';
+    try { conns[pid]?.open && conns[pid].send({ t:'receipt', id: m.id, s:'read' }); } catch(e) {}
+  });
+  if (unreadMsgs.length) saveMsgs();
+
   if (window.innerWidth <= 620) {
     document.getElementById('sidebar').classList.add('slide-out');
     document.getElementById('back-btn').style.display = 'flex';
@@ -1149,6 +1350,9 @@ function renderMsgs(pid) {
 
 function appendBubble(pid, msg, skipTypingMove = false) {
   const el = document.getElementById('messages');
+  // FIX 11: Don't append duplicate bubbles
+  if (el.querySelector(`.msg-group[data-id="${msg.id}"]`)) return;
+
   const isMe = msg.from === me.peerId;
   const g = document.createElement('div');
   g.className = `msg-group ${isMe ? 'me' : 'them'}`;
@@ -1195,7 +1399,7 @@ function buildFileBubble(msg, isMe) {
 
 function scrollDown() {
   const el = document.getElementById('messages');
-  el.scrollTop = el.scrollHeight;
+  requestAnimationFrame(() => { el.scrollTop = el.scrollHeight; });
 }
 
 // ═══════════════════════════════════
@@ -1208,7 +1412,7 @@ function checkAddLink() {
   if (parts.length < 2) return;
   const name = decodeURIComponent(parts[0]);
   const pid = parts.slice(1).join('/');
-  if (!pid || pid === me.peerId) return;
+  if (!pid || pid === me.peerId) { location.hash=''; return; }
   if (contacts.find(c => c.peerId === pid)) { toast(`${name} is already in contacts`); location.hash=''; return; }
   const banner = document.getElementById('add-banner');
   document.getElementById('banner-name').textContent = name;
@@ -1223,7 +1427,8 @@ function confirmAdd() {
   contacts.push(c);
   saveContacts();
   renderContacts();
-  dial(c);
+  // FIX 13: Small delay before dialing to let PeerJS register
+  setTimeout(() => dial(c), 500);
   b.style.display = 'none';
   location.hash = '';
   toast(`${c.name} added!`);
@@ -1271,7 +1476,7 @@ function saveProfile() {
   localStorage.setItem('wave_me', JSON.stringify(me));
   renderSidebarMe();
   closeOverlay('profile-overlay');
-  Object.values(conns).forEach(c => { if (c.open) c.send({ t:'hello', name: me.name, color: me.color }); });
+  Object.values(conns).forEach(c => { try { if (c.open) c.send({ t:'hello', name: me.name, color: me.color }); } catch(e) {} });
   toast('Profile saved');
 }
 
@@ -1281,7 +1486,6 @@ function setStatus(s) { document.getElementById('peer-status').textContent = s; 
 // SHARE MODAL
 // ═══════════════════════════════════
 function getRealOrigin() {
-  // Detect if running inside srcdoc/blob iframe (Claude preview)
   try {
     const loc = window.location.href;
     if (loc.startsWith('about:') || loc.startsWith('blob:') || loc.includes('srcdoc')) return null;
@@ -1305,7 +1509,6 @@ function openShareModal() {
   const isEmbedded = !url;
 
   if (isEmbedded) {
-    // Show instructions for embedded/preview mode
     document.getElementById('share-url-text').textContent = fragment;
     document.getElementById('share-embedded-notice').style.display = 'block';
     document.getElementById('share-copy-btn').style.display = 'none';
@@ -1321,9 +1524,7 @@ function openShareModal() {
   showOverlay('share-overlay');
 }
 
-function drawQR(text) {
-  qrDraw(text);
-}
+function drawQR(text) { qrDraw(text); }
 
 function copyLink() {
   const url = buildShareUrl();
@@ -1365,11 +1566,13 @@ function esc(s) {
   return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 function uid() { return crypto.randomUUID(); }
+
+// FIX 4: Generate PeerJS-safe IDs (alphanumeric + hyphens only)
 function genId() {
-  // stable-ish short id
-  return ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g,c=>
-    (c^crypto.getRandomValues(new Uint8Array(1))[0]&15>>c/4).toString(16));
+  const uuid = crypto.randomUUID(); // e.g. "a1b2c3d4-e5f6-..."
+  return 'wave-' + uuid; // prefix ensures it starts with a letter
 }
+
 function pause(ms) { return new Promise(r => setTimeout(r, ms)); }
 
 function fmtTime(ts) {
@@ -1397,9 +1600,8 @@ function fmtIcon(mime='') {
   return '📁';
 }
 
-
 // ═══════════════════════════════════
-// QR CODE — via qrcodejs (cdnjs)
+// QR CODE
 // ═══════════════════════════════════
 function qrDraw(url) {
   const container = document.getElementById('qr-container');
@@ -1421,6 +1623,28 @@ function qrDraw(url) {
 function saveContacts() { localStorage.setItem('wave_contacts', JSON.stringify(contacts)); }
 function saveMsgs() { localStorage.setItem('wave_messages', JSON.stringify(messages)); }
 function saveUnread() { localStorage.setItem('wave_unread', JSON.stringify(unread)); }
+
+// FIX 14: Handle page visibility — reconnect when user returns to tab
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'visible' && me) {
+    console.log('Tab visible again, checking connections…');
+    if (!peer || peer.destroyed) {
+      initPeer();
+    } else if (peer.disconnected) {
+      try { peer.reconnect(); } catch(e) { initPeer(); }
+    } else {
+      // Just re-dial any disconnected contacts
+      contacts.forEach(c => {
+        if (!conns[c.peerId]?.open) dial(c);
+      });
+    }
+  }
+});
+
+// FIX 15: Handle hash changes (for when someone opens a share link in existing tab)
+window.addEventListener('hashchange', () => {
+  if (me) checkAddLink();
+});
 </script>
 </body>
 </html>
